@@ -291,7 +291,7 @@ export default function LeagueProfilePage({ slug, navigate, onExternalClick, onO
             </div>
 
             <p className="text-[10px] text-slate-400 leading-tight">
-              Plaionn verifies source evidence at regular intervals. Listings without recent confirmations show an updated review notice.
+              RinkCircuit verifies source evidence at regular intervals. Listings without recent confirmations show an updated review notice.
             </p>
           </div>
 

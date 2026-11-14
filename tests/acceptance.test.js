@@ -14,7 +14,7 @@ async function runAllAcceptanceTests() {
   }
 
   console.log('\n========================================');
-  console.log('🧪 RUNNING PLAIONN HOCKEY ACCEPTANCE SUITE');
+  console.log('🧪 RUNNING RINKCIRCUIT ACCEPTANCE SUITE');
   console.log('========================================\n');
 
   // A01: Search an alias and apply city/night filters

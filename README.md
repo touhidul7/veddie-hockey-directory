@@ -1,4 +1,4 @@
-# 🏒 Plaionn Hockey Directory & Champions League Platform
+# RinkCircuit - Adult Hockey Directory
 
 > **Mobile-first Adult Hockey Discovery, Team Hub & Champions League Platform**  
 > Serving the Greater Toronto Area (GTA) with regional expansion capability via data configuration.
@@ -7,7 +7,7 @@
 
 ## 🎯 Executive Summary & Commercial Purpose
 
-The **Plaionn Hockey Directory** fulfills the developer handoff specification defined across `01_Product_and_UX.md`, `02_Data_and_Engineering.md`, `03_Delivery_and_Acceptance.md`, and `Wheelhouse Champions League & Challengers Cup Format.docx`.
+The **RinkCircuit directory** fulfills the developer handoff specification defined across `01_Product_and_UX.md`, `02_Data_and_Engineering.md`, `03_Delivery_and_Acceptance.md`, and `Wheelhouse Champions League & Challengers Cup Format.docx`.
 
 - **Commercial Flywheel:** Free, high-utility directory → opted-in player & captain relationships → tournament discovery → Champions League participation → evidence for future league launches.
 - **League Operator Partnership:** Transparent disclosures; free listing & referral traffic; respect for independent league governance.

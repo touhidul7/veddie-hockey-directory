@@ -272,7 +272,7 @@ New East York Rec League,Toronto,Independent ice,https://example.com/eastyork,Ne
               🏒
             </div>
             <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
-              Plaionn Operations Console
+              RinkCircuit Operations Console
             </h1>
             <p className="text-xs text-slate-500">
               Restricted access for league convenors, editors, and platform administrators.
@@ -371,7 +371,7 @@ New East York Rec League,Toronto,Independent ice,https://example.com/eastyork,Ne
           </div>
           <div>
             <h1 className="text-xl font-bold text-slate-900 tracking-tight">
-              Plaionn Editorial & Operations Console
+              RinkCircuit Editorial & Operations Console
             </h1>
             <p className="text-xs text-slate-500">Moderation, Freshness Alerts, Import Staging & Acceptance Suite</p>
           </div>

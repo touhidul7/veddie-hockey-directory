@@ -15,7 +15,7 @@ export default function OperatorsPage({ navigate, onOpenCorrection }) {
     },
     {
       title: 'Full Brand Independence',
-      desc: 'You keep complete control over your registration fees, schedules, rules, and ice allocation. Plaionn operates as a transparent discovery hub.',
+      desc: 'You keep complete control over your registration fees, schedules, rules, and ice allocation. RinkCircuit operates as a transparent discovery hub.',
       icon: ShieldCheck
     }
   ];
@@ -35,7 +35,7 @@ export default function OperatorsPage({ navigate, onOpenCorrection }) {
         </h1>
 
         <p className="text-slate-300 text-xs sm:text-sm max-w-2xl leading-relaxed">
-          Plaionn Hockey Directory exists to strengthen the adult hockey ecosystem in Greater Toronto.
+          RinkCircuit exists to strengthen the adult hockey ecosystem in Greater Toronto.
           We partner with independent league operators to fill team rosters, attract free agents, and celebrate division champions.
         </p>
 

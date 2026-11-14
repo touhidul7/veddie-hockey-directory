@@ -8,7 +8,6 @@ import HomePage from './pages/HomePage';
 import LeagueFinderPage from './pages/LeagueFinderPage';
 import LeagueProfilePage from './pages/LeagueProfilePage';
 import CityGuidePage from './pages/CityGuidePage';
-import ChampionsLeaguePage from './pages/ChampionsLeaguePage';
 import CaptainsClubPage from './pages/CaptainsClubPage';
 import TeamsDirectoryPage from './pages/TeamsDirectoryPage';
 import TeamProfilePage from './pages/TeamProfilePage';
@@ -86,11 +85,6 @@ export default function App() {
           onExternalClick={handleExternalClick}
         />
       );
-    }
-
-    // 5. Champions League
-    if (currentPath === '/champions-league') {
-      return <ChampionsLeaguePage navigate={navigate} />;
     }
 
     // 6. Captain's Club

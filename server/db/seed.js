@@ -487,7 +487,7 @@ function seedDatabase() {
     'pending', now
   );
 
-  console.log('✅ Database seeded successfully with full Plaionn Hockey Directory catalog!');
+  console.log('✅ Database seeded successfully with full RinkCircuit catalog!');
 }
 
 if (require.main === module) {

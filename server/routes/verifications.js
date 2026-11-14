@@ -1,27 +1,32 @@
 const express = require('express');
 const router = express.Router();
-const { getDb } = require('../db/database');
-const { sendVerificationEmail } = require('../services/emailService');
+const {
+  getDb
+} = require('../db/database');
+const {
+  sendVerificationEmail
+} = require('../services/emailService');
 
 /**
  * POST /api/email-verifications
  * Single-use token verification (Acceptance A09)
  */
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   const db = getDb();
-  const { token } = req.body;
-
+  const {
+    token
+  } = req.body;
   if (!token || typeof token !== 'string') {
-    return res.status(400).json({ error: 'A valid verification token is required.' });
+    return res.status(400).json({
+      error: 'A valid verification token is required.'
+    });
   }
-
-  const record = db.prepare(`
+  const record = await db.get(`
     SELECT v.id, v.token, v.lead_id, v.expires_at, v.used_at, l.email, l.name
-    FROM email_verifications v
-    JOIN leads l ON v.lead_id = l.id
+    FROM rinkcircuit.email_verifications v
+    JOIN rinkcircuit.leads l ON v.lead_id = l.id
     WHERE v.token = ?
-  `).get(token.trim());
-
+  `, token.trim());
   if (!record) {
     return res.status(404).json({
       error: 'Invalid verification token.',
@@ -29,7 +34,6 @@ router.post('/', (req, res) => {
       message: 'This verification link is invalid or does not exist.'
     });
   }
-
   const now = new Date().toISOString();
 
   // Acceptance A09: Check if reused
@@ -52,13 +56,10 @@ router.post('/', (req, res) => {
   }
 
   // Atomically mark token used and lead verified
-  const transaction = db.transaction(() => {
-    db.prepare("UPDATE email_verifications SET used_at = ? WHERE id = ?").run(now, record.id);
-    db.prepare("UPDATE leads SET verification_status = 'verified', updated_at = ? WHERE id = ?").run(now, record.lead_id);
+  await db.transaction(async () => {
+    await db.run("UPDATE rinkcircuit.email_verifications SET used_at = ? WHERE id = ?", now, record.id);
+    await db.run("UPDATE rinkcircuit.leads SET verification_status = 'verified', updated_at = ? WHERE id = ?", now, record.lead_id);
   });
-
-  transaction();
-
   res.json({
     success: true,
     message: 'Your email address has been successfully verified! Your hockey interest is now confirmed.',
@@ -70,15 +71,17 @@ router.post('/', (req, res) => {
  * POST /api/email-verifications/resend
  * Resend verification link safely
  */
-router.post('/resend', (req, res) => {
+router.post('/resend', async (req, res) => {
   const db = getDb();
-  const { email } = req.body;
-
+  const {
+    email
+  } = req.body;
   if (!email) {
-    return res.status(400).json({ error: 'Email is required.' });
+    return res.status(400).json({
+      error: 'Email is required.'
+    });
   }
-
-  const lead = db.prepare('SELECT id, name, email, verification_status FROM leads WHERE lower(email) = ?').get(email.trim().toLowerCase());
+  const lead = await db.get("SELECT id, name, email, verification_status FROM rinkcircuit.leads WHERE lower(email) = ?", email.trim().toLowerCase());
   if (!lead) {
     // Prevent email enumeration: return generic success message
     return res.json({
@@ -86,7 +89,6 @@ router.post('/resend', (req, res) => {
       message: 'If this email address exists in our system, a new verification link has been dispatched.'
     });
   }
-
   if (lead.verification_status === 'verified') {
     return res.json({
       success: true,
@@ -94,14 +96,11 @@ router.post('/resend', (req, res) => {
       message: 'Your email address is already verified!'
     });
   }
-
-  const emailRecord = sendVerificationEmail(lead.id, lead.email, lead.name);
-
+  const emailRecord = await sendVerificationEmail(lead.id, lead.email, lead.name);
   res.json({
     success: true,
     message: 'A new verification link has been dispatched to your email address.',
     verification_token: emailRecord.token // for dev/testing ease
   });
 });
-
 module.exports = router;

@@ -1,0 +1,19 @@
+[
+  "organisations",
+  "league_programmes",
+  "season_offerings",
+  "arenas",
+  "offering_arenas",
+  "source_evidence",
+  "slug_redirects",
+  "teams",
+  "events",
+  "leads",
+  "interests",
+  "email_verifications",
+  "consents",
+  "listing_requests",
+  "import_batches",
+  "import_rows",
+  "audit_logs"
+]

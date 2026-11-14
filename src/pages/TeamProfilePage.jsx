@@ -104,7 +104,7 @@ export default function TeamProfilePage({ slug, navigate }) {
 
         {/* Privacy Note */}
         <div className="text-[11px] text-slate-400 border-t border-slate-100 pt-3">
-          * Private team rosters and captain contact information are protected under Plaionn privacy policies and are not published publicly.
+          * Private team rosters and captain contact information are protected under RinkCircuit privacy policies and are not published publicly.
         </div>
       </div>
     </div>

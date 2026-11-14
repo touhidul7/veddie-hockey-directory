@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { getDb } = require('../db/database');
-
+const {
+  getDb
+} = require('../db/database');
 const CITY_METADATA = {
   toronto: {
     name: 'Toronto',
@@ -81,14 +82,13 @@ const CITY_METADATA = {
  * GET /api/locations
  * Returns list of curated cities
  */
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   const db = getDb();
-  const cities = Object.entries(CITY_METADATA).map(([key, meta]) => {
-    const count = db.prepare(`
-      SELECT count(*) as c FROM league_programmes
+  const cities = await Promise.all(Object.entries(CITY_METADATA).map(async ([key, meta]) => {
+    const count = (await db.get(`
+      SELECT count(*) as c FROM rinkcircuit.league_programmes
       WHERE lower(municipality) LIKE ? AND publication_status = 'published'
-    `).get(`%${meta.name.toLowerCase()}%`)?.c || 0;
-
+    `, `%${meta.name.toLowerCase()}%`))?.c || 0;
     return {
       key,
       name: meta.name,
@@ -96,35 +96,39 @@ router.get('/', (req, res) => {
       region: meta.region,
       leagueCount: count
     };
+  }));
+  res.json({
+    data: cities
   });
-
-  res.json({ data: cities });
 });
 
 /**
  * GET /api/locations/:province/:city
  * Curated city guide
  */
-router.get('/:province/:city', (req, res) => {
+router.get('/:province/:city', async (req, res) => {
   const db = getDb();
-  const { province, city } = req.params;
+  const {
+    province,
+    city
+  } = req.params;
   const cityKey = city.toLowerCase().replace(/[^a-z0-9\-]/g, '');
-
   const meta = CITY_METADATA[cityKey];
   if (!meta) {
-    return res.status(404).json({ error: 'City guide not yet published for this location' });
+    return res.status(404).json({
+      error: 'City guide not yet published for this location'
+    });
   }
 
   // Fetch published leagues in this municipality
-  const leagues = db.prepare(`
+  const leagues = await db.all(`
     SELECT
       p.id, p.name, p.slug, p.area, p.municipality, p.category, p.sport_type,
       p.description, p.verification_status, p.last_checked_at
-    FROM league_programmes p
+    FROM rinkcircuit.league_programmes p
     WHERE lower(p.municipality) LIKE ? AND p.publication_status = 'published'
     ORDER BY p.is_sponsored DESC, p.priority_score DESC, p.name ASC
-  `).all(`%${meta.name.toLowerCase()}%`);
-
+  `, `%${meta.name.toLowerCase()}%`);
   res.json({
     data: {
       meta,
@@ -133,5 +137,4 @@ router.get('/:province/:city', (req, res) => {
     }
   });
 });
-
 module.exports = router;

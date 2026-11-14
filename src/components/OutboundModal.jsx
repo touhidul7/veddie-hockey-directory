@@ -22,7 +22,7 @@ export default function OutboundModal({ isOpen, onClose, targetUrl, targetName }
             <h3 className="font-bold text-slate-900 text-base leading-snug">
               Visiting External Official Site
             </h3>
-            <p className="text-xs text-slate-500">Leaving Plaionn Hockey Directory</p>
+            <p className="text-xs text-slate-500">Leaving RinkCircuit</p>
           </div>
         </div>
 
@@ -37,7 +37,7 @@ export default function OutboundModal({ isOpen, onClose, targetUrl, targetName }
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-800 mb-6 flex items-start gap-2">
           <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
           <p>
-            Plaionn is an independent directory. Registrations, fee payments, and player eligibility are handled directly by the official league operator.
+            RinkCircuit is an independent directory. Registrations, fee payments, and player eligibility are handled directly by the official league operator.
           </p>
         </div>
 

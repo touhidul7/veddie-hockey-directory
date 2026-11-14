@@ -29,7 +29,7 @@ async function testServer() {
 
       // 2. Static HTML
       const home = await req('/');
-      console.log('Home HTML check:', home.status, home.body.includes('Plaionn Hockey Directory') ? 'OK' : 'MISSING');
+      console.log('Home HTML check:', home.status, home.body.includes('RinkCircuit') ? 'OK' : 'MISSING');
 
       // 3. Leagues API
       const leagues = await req('/api/leagues?limit=2');

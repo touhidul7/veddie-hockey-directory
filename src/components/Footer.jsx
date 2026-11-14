@@ -9,7 +9,7 @@ export default function Footer({ navigate }) {
           <div className="space-y-3 md:col-span-1">
             <div className="flex items-center space-x-2">
               <span className="text-xl">🏒</span>
-              <span className="font-extrabold text-white tracking-tight">PLAIONN HOCKEY</span>
+              <span className="font-extrabold text-white tracking-tight">RinkCircuit Hockey</span>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed">
               Greater Toronto's independent discovery directory for adult ice hockey leagues, recreational teams, and tournament competitions.
@@ -41,11 +41,6 @@ export default function Footer({ navigate }) {
               <li>
                 <button onClick={() => navigate('/tournaments')} className="hover:text-white transition-colors">
                   Upcoming Tournaments
-                </button>
-              </li>
-              <li>
-                <button onClick={() => navigate('/champions-league')} className="hover:text-white transition-colors">
-                  Plaionn Champions League Hub
                 </button>
               </li>
               <li>

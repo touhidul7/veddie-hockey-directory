@@ -3,6 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
+require('dotenv').config({ path: path.join(__dirname, '..', '.env'), quiet: true });
 
 function getLocalIpAddresses() {
   const interfaces = os.networkInterfaces();
@@ -47,7 +48,7 @@ app.use((req, res, next) => {
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'healthy',
-    service: 'Plaionn Hockey Directory API',
+    service: 'RinkCircuit API',
     version: '1.0.0',
     timestamp: new Date().toISOString()
   });
@@ -102,7 +103,7 @@ if (require.main === module) {
   const HOST = process.env.HOST || '0.0.0.0';
   app.listen(PORT, HOST, () => {
     const ips = getLocalIpAddresses();
-    console.log(`\n🏒 Plaionn Hockey Directory Server is LIVE!`);
+    console.log(`\n🏒 RinkCircuit Server is LIVE!`);
     console.log(`   ➜  Local:   http://localhost:${PORT}`);
     if (ips.length > 0) {
       ips.forEach(ip => {

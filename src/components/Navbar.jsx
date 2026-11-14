@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, X, Shield, Search, Trophy, Users, Building, HelpCircle } from 'lucide-react';
+import { Menu, X, Search, Trophy, Users, Building, HelpCircle } from 'lucide-react';
 
 export default function Navbar({ currentPath, navigate }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -8,7 +8,6 @@ export default function Navbar({ currentPath, navigate }) {
     { label: 'Find a League', path: '/leagues', icon: Search },
     { label: 'Teams', path: '/teams', icon: Users },
     { label: 'Tournaments', path: '/tournaments', icon: Trophy },
-    { label: 'Champions League', path: '/champions-league', badge: 'New', icon: Shield },
     { label: "Captain's Club", path: '/captains', icon: Users },
     { label: 'For Operators', path: '/operators', icon: Building }
   ];
@@ -29,7 +28,7 @@ export default function Navbar({ currentPath, navigate }) {
             </div>
             <div>
               <div className="font-extrabold text-lg tracking-tight flex items-center gap-1.5 text-white">
-                PLAIONN <span className="text-blue-400 font-semibold text-sm uppercase tracking-wider">HOCKEY</span>
+                RinkCircuit <span className="text-blue-400 font-semibold text-sm uppercase tracking-wider">HOCKEY</span>
               </div>
               <p className="text-[11px] text-slate-400 -mt-1 hidden sm:block">Greater Toronto Adult Directory</p>
             </div>

@@ -11,7 +11,7 @@ export function PrivacyPage() {
       <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 space-y-4 text-xs text-slate-700 leading-relaxed">
         <p><strong>Effective Date:</strong> November 5, 2026 • Version 1.0</p>
         <p>
-          Plaionn Sports Group operates the Plaionn Hockey Directory as an independent discovery tool for adult hockey players, captains, and league operators across the Greater Toronto Area.
+          Plaionn Sports Group operates the RinkCircuit as an independent discovery tool for adult hockey players, captains, and league operators across the Greater Toronto Area.
         </p>
         <h3 className="font-bold text-slate-900 text-sm pt-2">1. Information We Collect</h3>
         <p>
@@ -40,7 +40,7 @@ export function TermsPage() {
       <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 space-y-4 text-xs text-slate-700 leading-relaxed">
         <p><strong>Last Updated:</strong> November 5, 2026</p>
         <p>
-          The Plaionn Hockey Directory is a curated directory provided for general informational purposes.
+          The RinkCircuit is a curated directory provided for general informational purposes.
         </p>
         <h3 className="font-bold text-slate-900 text-sm pt-2">1. Independent League Governance</h3>
         <p>

@@ -118,12 +118,6 @@ export default function HomePage({ navigate, onExternalClick }) {
             >
               Explore Tournaments
             </button>
-            <button
-              onClick={() => navigate('/champions-league')}
-              className="bg-blue-600/30 hover:bg-blue-600/50 text-blue-300 px-3 py-1.5 rounded-lg border border-blue-500/40 transition-colors font-medium"
-            >
-              Champions League Info
-            </button>
           </div>
         </div>
       </section>
@@ -192,53 +186,6 @@ export default function HomePage({ navigate, onExternalClick }) {
             ))}
           </div>
         )}
-      </section>
-
-      {/* Plaionn Champions League Feature Banner */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gradient-to-r from-[#12202B] via-[#1a334d] to-[#12202B] rounded-2xl p-6 sm:p-10 text-white shadow-xl border border-slate-800 flex flex-col lg:flex-row items-center justify-between gap-8">
-          <div className="space-y-4 max-w-2xl">
-            <div className="inline-flex items-center gap-2 bg-amber-400/10 border border-amber-400/30 text-amber-300 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-              <Trophy className="w-3.5 h-3.5 text-amber-400" />
-              <span>Champions League & Challengers Cup</span>
-            </div>
-
-            <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight">
-              Win your league. <br className="hidden sm:inline" />
-              Take on the city.
-            </h2>
-
-            <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
-              A planned competition connecting adult hockey champions across independent leagues in the Greater Toronto Area.
-              Qualify through regular season 1st place or playoff championships. Contested across 5 reviewed skill tiers with season-long ties culminating in a centralized Final Eight.
-            </p>
-
-            <div className="flex flex-wrap gap-4 pt-2">
-              <button
-                onClick={() => navigate('/champions-league')}
-                className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow transition-colors flex items-center gap-1.5"
-              >
-                <span>Read Format & Register Interest</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* Quick Qualification Rule Box */}
-          <div className="bg-white/5 border border-white/10 rounded-xl p-5 text-xs text-slate-300 w-full lg:w-80 shrink-0 space-y-3">
-            <h4 className="font-bold text-white text-sm flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              How Teams Qualify
-            </h4>
-            <div className="space-y-2 text-[11px] leading-relaxed">
-              <p><strong className="text-amber-300">Champions League:</strong> 1st place regular season OR playoff champion from any GTA division.</p>
-              <p><strong className="text-sky-300">Challengers Cup:</strong> Teams finishing 2nd through top half of regular season.</p>
-              <p className="text-slate-400 text-[10px] pt-1 border-t border-white/10">
-                Placement is reviewed against independent skill tiers. Interest does not promise entry.
-              </p>
-            </div>
-          </div>
-        </div>
       </section>
 
       {/* Captain's Club Value Section */}
@@ -318,7 +265,7 @@ export default function HomePage({ navigate, onExternalClick }) {
               Keep your league. Give your teams more to play for.
             </h2>
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              We do not compete with independent league convenors. Plaionn provides free discovery, recruitment referral traffic, and a championship pathway that gives your division winners something bigger to contest at season's end.
+              We do not compete with independent league convenors. RinkCircuit provides free discovery, recruitment referral traffic, and a championship pathway that gives your division winners something bigger to contest at season's end.
             </p>
           </div>
           <div className="shrink-0 flex flex-col sm:flex-row gap-3">
