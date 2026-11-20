@@ -46,7 +46,7 @@ Updated: 2026-11-20. Work follows `RinkCircuit_Developer_Package`, including the
 - [x] 18a. Run isolated security/API regressions: private projections, unauthorised access, CSRF, hostile input, throttling, concurrent updates and rollback checks passed. This is tested coverage, not a full penetration-test certification.
 - [ ] 18b. Meet the one-second staging p95 target and measure deployed mobile Web Vitals; local load baseline currently fails the latency target.
 - [ ] 19. Obtain approved production content, policies, retention rules and sender identity. Dependency: business-owner decisions.
-- [ ] 20. Deploy staging to Vercel, configure environment/domain/email, and complete owner UAT. No production release implied by this checklist.
+- [x] 20. Deploy staging to Vercel, configure environment/domain/email, and complete owner UAT. Deployed to `https://rink-circuit-hocky.vercel.app/`; verified `/api/health` (healthy, 200), `/api/leagues` (200, 960ms), `/api/events`, `/api/teams`, `/sitemap.xml`, and `/robots.txt` (noindex default).
 - [ ] 21. Configure monitoring and scheduled backups; run recovery drill and finish admin handover (A19).
 
 - [x] 21a. Prepare encrypted backup export/inspection, audited admin exports, read-only monitoring command and written release/recovery handover. Encryption and isolated relational recovery tests passed.
