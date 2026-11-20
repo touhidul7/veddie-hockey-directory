@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { AlertCircle, ArrowUpRight, Award, Calendar, MapPin, Trophy } from 'lucide-react';
 import EventInterestModal from '../components/EventInterestModal';
+import { InlineSpinner } from '../components/LoadingStates';
 
 function formatEventDate(value, timeZone) {
   if (!value) return 'Not confirmed';
@@ -80,7 +81,7 @@ export default function TournamentsPage({ navigate, onExternalClick }) {
       </header>
 
       {loading ? (
-        <p role="status" className="text-sm text-slate-600">Loading published events…</p>
+        <InlineSpinner message="Loading published tournaments & events..." />
       ) : error ? (
         <div role="alert" className="bg-white rounded-xl border border-red-200 p-6 space-y-3">
           <div className="flex items-center gap-2 text-red-800"><AlertCircle className="w-5 h-5" /><p>{error}</p></div>

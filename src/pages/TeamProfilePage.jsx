@@ -1,6 +1,7 @@
 import {setMetadata} from '../lib/metadata';
 import React, { useState, useEffect } from 'react';
 import { Users, MapPin, Award, ChevronLeft, Shield, Calendar, Trophy } from 'lucide-react';
+import { DetailSkeleton } from '../components/LoadingStates';
 
 export default function TeamProfilePage({ slug, navigate }) {
   const [team, setTeam] = useState(null);
@@ -29,12 +30,7 @@ export default function TeamProfilePage({ slug, navigate }) {
   useEffect(()=>{if(team)setMetadata(team.name+' | RinkCircuit',true,'Approved public team information. Captain contact details remain private.');},[team]);
 
   if (loading) {
-    return (
-      <div className="max-w-3xl mx-auto px-4 py-12 animate-pulse space-y-4">
-        <div className="h-6 w-32 bg-slate-200 rounded"></div>
-        <div className="h-44 bg-slate-200 rounded-xl"></div>
-      </div>
-    );
+    return <DetailSkeleton />;
   }
 
   if (error || !team) {

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   Shield, CheckCircle2, AlertCircle, RefreshCw, Upload,
   Users, Building, FileSpreadsheet, Play, Check, X, Eye, EyeOff,
-  Lock, LogOut, KeyRound, User, ArrowRight
+  Lock, LogOut, KeyRound, User, ArrowRight, Loader2
 } from 'lucide-react';
 
 export default function AdminDashboardPage({ navigate }) {
@@ -361,8 +361,17 @@ New East York Rec League,Toronto,Independent ice,https://example.com/eastyork,Ne
                 disabled={loginLoading}
                 className="w-full bg-[#1463DF] hover:bg-blue-700 text-white font-semibold py-3 rounded-xl shadow transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
               >
-                <Lock className="w-4 h-4" />
-                <span>{loginLoading ? 'Authenticating...' : 'Sign In to Operations Console'}</span>
+                {loginLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Authenticating...</span>
+                  </>
+                ) : (
+                  <>
+                    <Lock className="w-4 h-4" />
+                    <span>Sign In to Operations Console</span>
+                  </>
+                )}
               </button>
             </div>
           </form>
@@ -731,9 +740,16 @@ New East York Rec League,Toronto,Independent ice,https://example.com/eastyork,Ne
               <button
                 onClick={handlePreviewImport}
                 disabled={loading}
-                className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-xl"
+                className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-xl flex items-center gap-1.5"
               >
-                {loading ? 'Analyzing...' : 'Parse & Generate Staging Preview'}
+                {loading ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Analyzing...</span>
+                  </>
+                ) : (
+                  'Parse & Generate Staging Preview'
+                )}
               </button>
             </div>
           </div>

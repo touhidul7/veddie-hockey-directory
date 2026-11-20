@@ -3,6 +3,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import OutboundModal from './components/OutboundModal';
 import CorrectionModal from './components/CorrectionModal';
+import { PageLoader } from './components/LoadingStates';
 
 const HomePage = lazy(()=>import('./pages/HomePage'));
 const LeagueFinderPage = lazy(()=>import('./pages/LeagueFinderPage'));
@@ -182,7 +183,7 @@ export default function App() {
         <a href="#main-content" className="sr-only focus:not-sr-only focus:block focus:p-3">Skip to main content</a>
         <Navbar currentPath={currentPath} navigate={navigate} />
         <main id="main-content" tabIndex={-1} className="animate-in fade-in duration-150">
-          <Suspense fallback={<p role="status" className="p-8">Loading page?</p>}>{renderPage()}</Suspense>
+          <Suspense fallback={<PageLoader message="Loading page..." />}>{renderPage()}</Suspense>
         </main>
       </div>
 

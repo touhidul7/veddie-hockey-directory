@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Trophy, Users, Shield, ArrowRight, MapPin, CheckCircle2, ChevronRight, Sparkles } from 'lucide-react';
 import LeagueCard from '../components/LeagueCard';
+import { CardSkeletonGrid, InlineSpinner } from '../components/LoadingStates';
 
 function formatEventDate(value) {
   if (!value) return 'Dates not confirmed';
@@ -218,11 +219,7 @@ export default function HomePage({ navigate, onExternalClick }) {
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
-            {[1, 2, 3, 4, 5, 6].map((n) => (
-              <div key={n} className="bg-white rounded-xl h-64 border border-slate-200"></div>
-            ))}
-          </div>
+          <CardSkeletonGrid count={6} cols={3} />
         ) : loadError ? (
           <div role="alert" className="bg-white border border-red-200 rounded-xl p-5 text-sm text-red-800">
             {loadError} <button type="button" onClick={() => setRetry(value => value + 1)} className="font-semibold underline">Retry</button>
@@ -259,7 +256,7 @@ export default function HomePage({ navigate, onExternalClick }) {
           </button>
         </div>
         {loading ? (
-          <p role="status" className="text-sm text-slate-600">Loading published events…</p>
+          <InlineSpinner message="Loading published tournaments & events..." />
         ) : loadError ? (
           <div role="alert" className="bg-white border border-red-200 rounded-xl p-5 text-sm text-red-800">
             {loadError} <button type="button" onClick={() => setRetry(value => value + 1)} className="font-semibold underline">Retry</button>

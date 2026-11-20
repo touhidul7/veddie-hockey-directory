@@ -5,6 +5,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Search, Filter, RotateCcw, AlertCircle, HelpCircle, ArrowRight } from 'lucide-react';
 import LeagueCard from '../components/LeagueCard';
 import FilterSidebar from '../components/FilterSidebar';
+import { CardSkeletonGrid } from '../components/LoadingStates';
 
 export default function LeagueFinderPage({ navigate, onExternalClick, initialQuery }) {
   const [leagues, setLeagues] = useState([]);
@@ -225,13 +226,25 @@ export default function LeagueFinderPage({ navigate, onExternalClick, initialQue
 
         {/* Listings Result Column */}
         <div className="lg:col-span-3 space-y-6">
-          <p role="status" aria-live="polite" className="text-sm">{loading?'Loading results…':error?'Search unavailable':`${totalMatches} matching programmes`}</p>
-          {error ? <div role="alert" className="rounded-xl bg-white border p-6"><p>{error}</p><button className="underline text-blue-700" onClick={()=>setRetry(retry+1)}>Retry search</button></div> : loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-pulse">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="bg-white rounded-xl h-64 border border-slate-200"></div>
-              ))}
+          <p role="status" aria-live="polite" className="text-xs sm:text-sm font-semibold text-slate-600">
+            {loading ? (
+              <span className="inline-flex items-center gap-2 text-blue-600">
+                <span className="w-2 h-2 rounded-full bg-blue-600 animate-ping"></span>
+                <span>Searching verified GTA leagues...</span>
+              </span>
+            ) : error ? (
+              'Search unavailable'
+            ) : (
+              `${totalMatches} matching adult hockey leagues found`
+            )}
+          </p>
+          {error ? (
+            <div role="alert" className="rounded-xl bg-white border border-red-200 p-6 space-y-2">
+              <p className="text-sm text-red-700">{error}</p>
+              <button className="text-xs font-bold underline text-blue-700" onClick={()=>setRetry(retry+1)}>Retry search</button>
             </div>
+          ) : loading ? (
+            <CardSkeletonGrid count={6} cols={2} />
           ) : leagues.length === 0 ? (
             // Acceptance A02: Empty state with clear filters and unmet demand form
             <div className="bg-white rounded-2xl border border-slate-200 p-8 sm:p-12 text-center space-y-4">

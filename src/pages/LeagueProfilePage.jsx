@@ -1,6 +1,7 @@
 import {track} from '../lib/analytics';
 import {setMetadata} from '../lib/metadata';
 import React, { useState, useEffect } from 'react';
+import { DetailSkeleton } from '../components/LoadingStates';
 import {
   MapPin, Calendar, Award, ExternalLink, ShieldCheck, CheckCircle2,
   AlertCircle, Edit3, ChevronLeft, Building2, Users, Clock, Info
@@ -40,13 +41,7 @@ export default function LeagueProfilePage({ slug, navigate, onExternalClick, onO
   useEffect(()=>{if(league){setMetadata(league.name+' | RinkCircuit',true,league.description||'Programme details and official sources. Check current details with the operator.');track('league_viewed');}},[league]);
 
   if (loading) {
-    return (
-      <div className="max-w-4xl mx-auto px-4 py-12 animate-pulse space-y-6">
-        <div className="h-6 w-32 bg-slate-200 rounded"></div>
-        <div className="h-10 w-full max-w-96 bg-slate-200 rounded"></div>
-        <div className="h-64 bg-slate-200 rounded-xl"></div>
-      </div>
-    );
+    return <DetailSkeleton />;
   }
 
   if (error || !league) {

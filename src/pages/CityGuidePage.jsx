@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MapPin, Building, ChevronLeft, ArrowRight, ShieldCheck } from 'lucide-react';
 import LeagueCard from '../components/LeagueCard';
+import { DetailSkeleton } from '../components/LoadingStates';
 
 export default function CityGuidePage({ province, city, navigate, onExternalClick }) {
   const [data, setData] = useState(null);
@@ -26,15 +27,7 @@ export default function CityGuidePage({ province, city, navigate, onExternalClic
   }, [province, city]);
 
   if (loading) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 py-12 animate-pulse space-y-6">
-        <div className="h-6 w-32 bg-slate-200 rounded"></div>
-        <div className="h-12 w-80 bg-slate-200 rounded"></div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[1, 2, 3].map((i) => <div key={i} className="h-64 bg-slate-200 rounded-xl"></div>)}
-        </div>
-      </div>
-    );
+    return <DetailSkeleton />;
   }
 
   if (error || !data) {

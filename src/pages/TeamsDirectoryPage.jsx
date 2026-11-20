@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Users, MapPin, Award, PlusCircle, ArrowRight } from 'lucide-react';
+import { CardSkeletonGrid } from '../components/LoadingStates';
 
 export default function TeamsDirectoryPage({ navigate }) {
   const [teams, setTeams] = useState([]);
@@ -65,11 +66,7 @@ export default function TeamsDirectoryPage({ navigate }) {
 
       {/* Teams Grid */}
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="bg-white rounded-xl h-44 border border-slate-200"></div>
-          ))}
-        </div>
+        <CardSkeletonGrid count={6} cols={3} />
       ) : teams.length === 0 ? (
         <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center space-y-3">
           <Users className="w-10 h-10 text-slate-600 mx-auto" />

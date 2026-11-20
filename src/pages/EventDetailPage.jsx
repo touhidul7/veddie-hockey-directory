@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { AlertCircle, ArrowLeft, ArrowUpRight, Calendar, MapPin, Trophy } from 'lucide-react';
 import EventInterestModal from '../components/EventInterestModal';
+import { DetailSkeleton } from '../components/LoadingStates';
 import { safeUrl } from '../lib/safeUrl';
 import { setMetadata } from '../lib/metadata';
 
@@ -78,7 +79,7 @@ export default function EventDetailPage({ slug, navigate, onExternalClick }) {
     return () => controller.abort();
   }, [slug, retry]);
 
-  if (loading) return <p role="status" className="max-w-4xl mx-auto px-4 py-12">Loading event details…</p>;
+  if (loading) return <DetailSkeleton />;
 
   if (error || !event) {
     return (
