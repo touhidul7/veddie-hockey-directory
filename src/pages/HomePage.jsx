@@ -80,49 +80,51 @@ export default function HomePage({ navigate, onExternalClick }) {
   return (
     <div className="space-y-16 pb-16">
       {/* Hero Section */}
-      <section className="bg-gradient-to-b from-[#12202B] via-[#162736] to-[#12202B] text-white pt-12 pb-20 px-4 sm:px-6 lg:px-8 border-b border-slate-800 relative overflow-hidden">
-        {/* Subtle ice background pattern */}
-        <div className="absolute inset-0 opacity-5 pointer-events-none bg-[radial-gradient(#1463DF_1px,transparent_1px)] [background-size:16px_16px]"></div>
+      <section className="bg-gradient-to-b from-[#0B131E] via-[#111D2B] to-[#0F172A] text-white pt-16 pb-24 px-4 sm:px-6 lg:px-8 border-b border-slate-800/80 relative overflow-hidden">
+        {/* Subtle ice background glow and radial mesh */}
+        <div className="absolute inset-0 opacity-15 pointer-events-none bg-[radial-gradient(#38BDF8_1px,transparent_1px)] [background-size:24px_24px]"></div>
+        <div className="absolute -top-32 -right-32 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
         <div className="max-w-4xl mx-auto text-center relative z-10 space-y-6">
-          <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/30 text-blue-300 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5 text-blue-400" />
-            <span>Greater Toronto Area • Hockey Directory</span>
+          <div className="inline-flex items-center gap-2 bg-blue-500/15 border border-blue-400/30 text-blue-300 px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide shadow-sm shadow-blue-500/10">
+            <Sparkles className="w-4 h-4 text-sky-400 animate-pulse" />
+            <span>Greater Toronto Area • Verified Hockey Directory</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.12]">
             Your next great season <br className="hidden sm:inline" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-300">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-blue-300 to-indigo-300">
               starts right here.
             </span>
           </h1>
 
-          <p className="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-            Find adult hockey leagues, join an approved team, and discover upcoming tournaments near you across the GTA.
+          <p className="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed font-normal">
+            Discover verified adult ice and ball hockey leagues, connect with approved teams, and explore local tournaments across the Greater Toronto Area.
           </p>
 
           {/* Quick Search Form */}
           <form
             onSubmit={handleSearchSubmit}
-            className="bg-white p-2.5 sm:p-3 rounded-2xl shadow-xl max-w-2xl mx-auto flex flex-col sm:flex-row gap-2.5 text-slate-900 border border-slate-200"
+            className="bg-white/95 backdrop-blur-md p-2.5 sm:p-3.5 rounded-2xl shadow-2xl shadow-black/40 max-w-2xl mx-auto flex flex-col sm:flex-row gap-2.5 text-slate-900 border border-white/20 ring-1 ring-black/5"
           >
-            <div className="flex-1 flex items-center px-3 bg-slate-50 rounded-xl border border-slate-200 focus-within:border-blue-500 focus-within:bg-white transition-colors">
-              <Search className="w-4 h-4 text-slate-600 shrink-0" />
+            <div className="flex-1 flex items-center px-3.5 bg-slate-50 rounded-xl border border-slate-200/90 focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/20 transition-all">
+              <Search className="w-4 h-4 text-slate-500 shrink-0" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search league name, arena, or keyword..."
-                className="w-full text-xs sm:text-sm px-2 py-2.5 bg-transparent focus:outline-none"
+                placeholder="Search league name, arena, or division..."
+                className="w-full text-xs sm:text-sm px-2.5 py-2.5 sm:py-3 bg-transparent focus:outline-none placeholder:text-slate-400"
               />
             </div>
 
-            <div className="sm:w-44 flex items-center px-3 bg-slate-50 rounded-xl border border-slate-200">
-              <MapPin className="w-4 h-4 text-slate-600 shrink-0" />
+            <div className="sm:w-48 flex items-center px-3 bg-slate-50 rounded-xl border border-slate-200/90 focus-within:border-blue-500 focus-within:bg-white transition-all">
+              <MapPin className="w-4 h-4 text-slate-500 shrink-0" />
               <select aria-label="Choose a city"
                 value={selectedCity}
                 onChange={(e) => setSelectedCity(e.target.value)}
-                className="w-full text-xs sm:text-sm py-2.5 bg-transparent focus:outline-none text-slate-700"
+                className="w-full text-xs sm:text-sm py-2.5 sm:py-3 bg-transparent focus:outline-none text-slate-800 font-medium"
               >
                 <option value="">All GTA Cities</option>
                 {popularCities.map((c) => (
@@ -133,28 +135,31 @@ export default function HomePage({ navigate, onExternalClick }) {
 
             <button
               type="submit"
-              className="bg-[#1463DF] hover:bg-blue-700 text-white font-semibold text-xs sm:text-sm px-6 py-2.5 rounded-xl shadow transition-colors flex items-center justify-center gap-1.5"
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs sm:text-sm px-6 py-3 rounded-xl shadow-lg shadow-blue-600/30 transition-all flex items-center justify-center gap-2 hover:scale-[1.02]"
             >
-              <span>Find a League</span>
+              <span>Find Leagues</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
 
-          {/* Secondary Actions */}
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-2 text-xs text-slate-300">
-            <span className="text-slate-300">Quick Links:</span>
-            <button
-              onClick={() => navigate('/captains')}
-              className="bg-slate-800/80 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition-colors"
-            >
-              Register Your Team
-            </button>
-            <button
-              onClick={() => navigate('/tournaments')}
-              className="bg-slate-800/80 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition-colors"
-            >
-              Explore Tournaments
-            </button>
+          {/* Quick Metrics Bar */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl mx-auto pt-4">
+            <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-3 text-center backdrop-blur-xs">
+              <div className="text-xl sm:text-2xl font-extrabold text-sky-400">44+</div>
+              <div className="text-[11px] text-slate-400 uppercase font-semibold tracking-wider">Verified Leagues</div>
+            </div>
+            <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-3 text-center backdrop-blur-xs">
+              <div className="text-xl sm:text-2xl font-extrabold text-blue-400">11</div>
+              <div className="text-[11px] text-slate-400 uppercase font-semibold tracking-wider">GTA Hubs</div>
+            </div>
+            <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-3 text-center backdrop-blur-xs">
+              <div className="text-xl sm:text-2xl font-extrabold text-emerald-400">100%</div>
+              <div className="text-[11px] text-slate-400 uppercase font-semibold tracking-wider">Curated Data</div>
+            </div>
+            <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-3 text-center backdrop-blur-xs">
+              <div className="text-xl sm:text-2xl font-extrabold text-indigo-400">Free</div>
+              <div className="text-[11px] text-slate-400 uppercase font-semibold tracking-wider">Community Directory</div>
+            </div>
           </div>
         </div>
       </section>
@@ -163,15 +168,19 @@ export default function HomePage({ navigate, onExternalClick }) {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
           <div>
-            <h2 className="text-xl font-bold text-slate-900 tracking-tight">Curated City Hubs</h2>
-            <p className="text-xs text-slate-600">Explore local adult hockey ecosystems by municipality</p>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-blue-600"></span>
+              <span className="text-xs font-bold text-blue-600 uppercase tracking-wider">Municipal Hubs</span>
+            </div>
+            <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight mt-0.5">Explore by Municipality</h2>
+            <p className="text-xs sm:text-sm text-slate-600">Select a city to browse local arenas, offerings, and league contacts.</p>
           </div>
           <button
             onClick={() => navigate('/leagues')}
-            className="text-xs font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1"
+            className="text-xs sm:text-sm font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 group"
           >
-            <span>View All GTA Leagues</span>
-            <ChevronRight className="w-4 h-4" />
+            <span>View All 44 GTA Leagues</span>
+            <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
           </button>
         </div>
 
@@ -180,10 +189,13 @@ export default function HomePage({ navigate, onExternalClick }) {
             <button
               key={city}
               onClick={() => navigate(`/locations/on/${city.toLowerCase()}`)}
-              className="p-3 bg-white rounded-xl border border-slate-200 hover:border-blue-400 hover:shadow-sm text-left transition-all group"
+              className="p-3.5 bg-white rounded-xl border border-slate-200/90 hover:border-blue-500 hover:shadow-md text-left transition-all group card-hover-lift"
             >
-              <div className="text-xs font-bold text-slate-800 group-hover:text-blue-600 truncate">{city}</div>
-              <div className="text-[11px] text-slate-600 mt-0.5">Explore guide →</div>
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xs font-bold text-slate-900 group-hover:text-blue-600 truncate">{city}</span>
+                <MapPin className="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-500 transition-colors" />
+              </div>
+              <div className="text-[11px] text-slate-500 group-hover:text-slate-700">Explore guide →</div>
             </button>
           ))}
         </div>

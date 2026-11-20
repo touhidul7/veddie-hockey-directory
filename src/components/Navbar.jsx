@@ -18,39 +18,39 @@ export default function Navbar({ currentPath, navigate }) {
   }
 
   return (
-    <header className="sticky top-0 z-40 bg-[#12202B] text-white border-b border-slate-800 shadow-md">
+    <header className="sticky top-0 z-50 bg-[#0B131E]/95 backdrop-blur-md text-white border-b border-slate-800/80 shadow-lg shadow-black/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-16 sm:h-18">
           {/* Logo & Brand */}
-          <div className="flex items-center space-x-2 sm:space-x-3 cursor-pointer" onClick={() => handleNavigate('/')}>
-            <div className="w-10 h-10 rounded-lg bg-[#1463DF] flex items-center justify-center font-bold text-xl tracking-wider text-white shadow-inner">
+          <div className="flex items-center space-x-2.5 sm:space-x-3.5 cursor-pointer group" onClick={() => handleNavigate('/')}>
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-xl shadow-lg shadow-blue-500/25 ring-1 ring-white/20 group-hover:scale-105 transition-transform duration-200">
               🏒
             </div>
             <div>
               <div className="font-extrabold text-lg tracking-tight flex items-center gap-1.5 text-white">
-                RinkCircuit <span className="hidden sm:inline text-blue-400 font-semibold text-sm uppercase tracking-wider">HOCKEY</span>
+                RinkCircuit <span className="hidden sm:inline bg-blue-500/20 text-blue-400 border border-blue-500/30 px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wider">GTA</span>
               </div>
-              <p className="text-[11px] text-slate-400 -mt-1 hidden sm:block">Greater Toronto Adult Directory</p>
+              <p className="text-[11px] text-slate-400 -mt-0.5 hidden sm:block">Greater Toronto Adult Hockey Directory</p>
             </div>
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-1 lg:space-x-2">
+          <nav className="hidden lg:flex items-center space-x-1">
             {navLinks.map((item) => {
               const active = currentPath === item.path || (item.path !== '/' && currentPath.startsWith(item.path));
               return (
                 <button
                   key={item.path}
                   onClick={() => handleNavigate(item.path)}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1.5 ${
+                  className={`px-3.5 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-1.5 ${
                     active
-                      ? 'bg-blue-600/20 text-blue-300 border border-blue-500/30'
-                      : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                      ? 'bg-blue-600/20 text-blue-300 ring-1 ring-blue-500/40 shadow-sm'
+                      : 'text-slate-300 hover:text-white hover:bg-slate-800/70'
                   }`}
                 >
                   <span>{item.label}</span>
                   {item.badge && (
-                    <span className="text-[10px] bg-amber-500 text-slate-950 font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">
+                    <span className="text-[10px] bg-amber-500 text-slate-950 font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider">
                       {item.badge}
                     </span>
                   )}
@@ -60,10 +60,10 @@ export default function Navbar({ currentPath, navigate }) {
           </nav>
 
           {/* Header Action & Mobile Menu Toggle */}
-          <div className="flex items-center space-x-1 sm:space-x-3">
+          <div className="flex items-center space-x-2 sm:space-x-3">
             <button
               onClick={() => handleNavigate('/admin')}
-              className="text-xs text-slate-400 hover:text-slate-200 px-2 py-1 rounded border border-slate-700 hover:border-slate-500 transition-colors hidden sm:block"
+              className="text-xs text-slate-400 hover:text-slate-200 px-2.5 py-1.5 rounded-lg border border-slate-700/80 hover:border-slate-500 hover:bg-slate-800/50 transition-colors hidden sm:block"
               title="Editorial & Moderation Console"
             >
               Admin Portal
@@ -71,7 +71,7 @@ export default function Navbar({ currentPath, navigate }) {
 
             <button
               onClick={() => handleNavigate('/leagues')}
-              className="bg-[#1463DF] hover:bg-blue-700 text-white font-medium text-[11px] sm:text-sm px-2.5 sm:px-3.5 py-2 rounded-md shadow transition-colors flex items-center gap-1"
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-xs sm:text-sm px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl shadow-md shadow-blue-600/25 transition-all flex items-center gap-1.5 hover:scale-[1.02]"
             >
               <Search className="w-3.5 h-3.5" />
               <span>Explore Leagues</span>
@@ -79,7 +79,7 @@ export default function Navbar({ currentPath, navigate }) {
 
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 focus:outline-none"
+              className="lg:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 focus:outline-none"
               aria-label="Toggle Menu"
               aria-expanded={mobileMenuOpen}
               aria-controls="mobile-navigation"

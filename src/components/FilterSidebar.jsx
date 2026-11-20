@@ -26,53 +26,55 @@ export default function FilterSidebar({ filters, setFilters, onReset, totalMatch
   }
 
   return (
-    <aside className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-6">
+    <aside className="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-sm space-y-6">
       {/* Sidebar Header */}
-      <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+      <div className="flex items-center justify-between pb-3.5 border-b border-slate-100">
         <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-blue-600" />
+          <div className="w-6 h-6 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center">
+            <Filter className="w-3.5 h-3.5" />
+          </div>
           <h3 className="font-bold text-slate-900 text-sm">Filter Leagues</h3>
         </div>
 
         {hasActiveFilters() && (
           <button
             onClick={onReset}
-            className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1 font-medium"
+            className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1 font-semibold transition-colors"
           >
             <RotateCcw className="w-3 h-3" />
-            <span>Reset</span>
+            <span>Reset All</span>
           </button>
         )}
       </div>
 
       {/* Results Count Banner */}
-      <div className="bg-blue-50 text-blue-900 text-xs px-3 py-2 rounded-lg font-medium flex items-center justify-between">
-        <span>Matching Listings:</span>
-        <span className="font-bold text-sm">{totalMatches}</span>
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50/50 text-blue-900 text-xs px-3.5 py-2.5 rounded-xl font-medium flex items-center justify-between border border-blue-100/80">
+        <span className="font-medium text-slate-700">Matching Listings:</span>
+        <span className="font-extrabold text-blue-600 text-sm bg-white px-2 py-0.5 rounded-md shadow-2xs">{totalMatches}</span>
       </div>
 
       {/* Sport Category Switcher */}
       <div>
         <div className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Sport Type</div>
-        <div className="grid grid-cols-3 gap-2" role="group" aria-label="Sport type">
+        <div className="grid grid-cols-3 gap-1.5 p-1 bg-slate-100/80 rounded-xl" role="group" aria-label="Sport type">
           <button
             type="button"
             aria-pressed={filters.sport === 'all'}
             onClick={() => setFilters({ ...filters, sport: 'all' })}
-            className={`py-1.5 px-2 rounded-lg text-xs font-semibold border text-center transition-colors ${
-              filters.sport === 'all' ? 'bg-blue-600 text-white border-blue-600' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+            className={`py-1.5 px-2 rounded-lg text-xs font-semibold text-center transition-all ${
+              filters.sport === 'all' ? 'bg-white text-blue-600 shadow-sm font-bold' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            All
+            All Sports
           </button>
           <button
             type="button"
             aria-pressed={filters.sport === 'ice_hockey'}
             onClick={() => setFilters({ ...filters, sport: 'ice_hockey' })}
-            className={`py-1.5 px-3 rounded-lg text-xs font-semibold border text-center transition-colors ${
+            className={`py-1.5 px-2 rounded-lg text-xs font-semibold text-center transition-all ${
               filters.sport === 'ice_hockey'
-                ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
-                : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                ? 'bg-white text-blue-600 shadow-sm font-bold'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             Ice Hockey
@@ -81,10 +83,10 @@ export default function FilterSidebar({ filters, setFilters, onReset, totalMatch
             type="button"
             aria-pressed={filters.sport === 'ball_hockey'}
             onClick={() => setFilters({ ...filters, sport: 'ball_hockey' })}
-            className={`py-1.5 px-3 rounded-lg text-xs font-semibold border text-center transition-colors ${
+            className={`py-1.5 px-2 rounded-lg text-xs font-semibold text-center transition-all ${
               filters.sport === 'ball_hockey'
-                ? 'bg-orange-600 text-white border-orange-600 shadow-sm'
-                : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                ? 'bg-white text-orange-600 shadow-sm font-bold'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             Ball Hockey
@@ -94,11 +96,11 @@ export default function FilterSidebar({ filters, setFilters, onReset, totalMatch
 
       <label className="block text-xs font-bold text-slate-700">
         Programme Category
-        <input className="block w-full border rounded p-2 mt-2 font-normal" value={filters.category || ''} onChange={e => setFilters({ ...filters, category: e.target.value })} placeholder="e.g. Adult recreational" />
+        <input className="block w-full border border-slate-200 bg-slate-50/50 rounded-xl p-2.5 mt-1.5 font-normal text-xs focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all placeholder:text-slate-400" value={filters.category || ''} onChange={e => setFilters({ ...filters, category: e.target.value })} placeholder="e.g. Adult recreational, Corporate" />
       </label>
       <label className="block text-xs font-bold text-slate-700">
         Age Eligibility
-        <input className="block w-full border rounded p-2 mt-2 font-normal" value={filters.age || ''} onChange={e => setFilters({ ...filters, age: e.target.value })} placeholder="Use the programme's wording" />
+        <input className="block w-full border border-slate-200 bg-slate-50/50 rounded-xl p-2.5 mt-1.5 font-normal text-xs focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all placeholder:text-slate-400" value={filters.age || ''} onChange={e => setFilters({ ...filters, age: e.target.value })} placeholder="e.g. 19+, 30+, 35+" />
       </label>
 
       {/* Municipality / Area */}
@@ -106,14 +108,16 @@ export default function FilterSidebar({ filters, setFilters, onReset, totalMatch
         <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2.5">
           GTA Municipality
         </label>
-        <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+        <div className="space-y-1 max-h-48 overflow-y-auto pr-1">
           {municipalities.map((city) => {
             const activeCities = filters.city ? filters.city.split(',').map(c => c.trim()) : [];
             const isChecked = activeCities.includes(city);
             return (
               <label
                 key={city}
-                className="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer hover:text-slate-900 select-none py-0.5"
+                className={`flex items-center space-x-2 text-xs cursor-pointer select-none py-1.5 px-2 rounded-lg transition-colors ${
+                  isChecked ? 'bg-blue-50 text-blue-900 font-semibold' : 'text-slate-700 hover:bg-slate-50'
+                }`}
               >
                 <input
                   type="checkbox"
@@ -121,7 +125,7 @@ export default function FilterSidebar({ filters, setFilters, onReset, totalMatch
                   onChange={() => toggleCity(city)}
                   className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-3.5 h-3.5"
                 />
-                <span className={isChecked ? 'font-semibold text-blue-900' : ''}>{city}</span>
+                <span>{city}</span>
               </label>
             );
           })}

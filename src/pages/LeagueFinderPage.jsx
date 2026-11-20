@@ -121,44 +121,47 @@ export default function LeagueFinderPage({ navigate, onExternalClick, initialQue
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-8">
       {/* Page Title & Search Bar */}
       <div className="space-y-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200/80 mb-2">
+            <span>🏒 Live GTA League Catalogue</span>
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
             Adult Hockey League Finder
           </h1>
-          <p className="text-xs sm:text-sm text-slate-600 mt-1">
+          <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl">
             Search published adult recreational, commercial, and oldtimers leagues across the Greater Toronto Area.
           </p>
         </div>
 
         {/* Top Search & Sort Controls */}
-        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
-          <div className="flex-1 flex items-center px-3 bg-slate-50 rounded-lg border border-slate-200 focus-within:border-blue-500 focus-within:bg-white transition-colors">
-            <Search className="w-4 h-4 text-slate-600 shrink-0" />
+        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200/90 shadow-sm">
+          <div className="flex-1 flex items-center px-3.5 bg-slate-50/80 rounded-xl border border-slate-200 focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/20 transition-all">
+            <Search className="w-4 h-4 text-slate-500 shrink-0" />
             <input
               aria-label="Search leagues"
               type="text"
               value={filters.q}
               onChange={(e) => setFilters({ ...filters, q: e.target.value })}
               placeholder="Search by league name, arena name, or municipal alias..."
-              className="w-full text-xs sm:text-sm px-2.5 py-2 bg-transparent focus:outline-none"
+              className="w-full text-xs sm:text-sm px-2.5 py-2.5 bg-transparent focus:outline-none placeholder:text-slate-400"
             />
             {filters.q && (
               <button
                 aria-label="Clear search" onClick={() => setFilters({ ...filters, q: '' })}
-                className="text-xs text-slate-600 hover:text-slate-600 p-1"
+                className="text-xs text-slate-400 hover:text-slate-700 p-1"
               >
                 ✕
               </button>
             )}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <button
               aria-expanded={mobileFilterOpen} onClick={() => setMobileFilterOpen(!mobileFilterOpen)}
-              className="lg:hidden px-3.5 py-2 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100 flex items-center gap-1.5"
+              className="lg:hidden px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100 flex items-center gap-1.5 transition-colors"
             >
               <Filter className="w-3.5 h-3.5 text-blue-600" />
               <span>Filters ({totalMatches})</span>
@@ -167,7 +170,7 @@ export default function LeagueFinderPage({ navigate, onExternalClick, initialQue
             <select
               aria-label="Sort leagues" value={filters.sort}
               onChange={(e) => setFilters({ ...filters, sort: e.target.value })}
-              className="text-xs font-medium px-3 py-2 rounded-lg border border-slate-200 bg-slate-50 text-slate-700 focus:outline-none"
+              className="text-xs font-semibold px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 focus:outline-none focus:border-blue-500 transition-colors"
             >
               <option value="relevance">Sort: Relevance</option>
               <option value="name">Sort: League Name (A-Z)</option>
