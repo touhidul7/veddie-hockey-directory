@@ -60,7 +60,8 @@ export default function VerifyEmailPage({ navigate }) {
         body: JSON.stringify({ email: emailForResend })
       });
       const data = await res.json();
-      setResendStatus(data.message || 'A new link has been dispatched.');
+      if (!res.ok) throw new Error(data.error || 'Unable to request a verification link.');
+      setResendStatus(data.message || 'Your verification email request has been recorded.');
     } catch (err) {
       setResendStatus('Error sending link: ' + err.message);
     }

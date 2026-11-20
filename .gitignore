@@ -8,6 +8,8 @@ yarn-error.log*
 dist/
 build/
 
+RinkCircuit_Developer_Package/
+
 # Local SQLite databases & WAL logs
 server/db/*.db
 server/db/*.db-wal
@@ -31,3 +33,8 @@ desktop.ini
 *.log
 .system_generated/
 scratch/
+
+# Private operational exports and browser artifacts
+private-backups/
+artifacts/
+.vercel/

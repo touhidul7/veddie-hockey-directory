@@ -1,6 +1,3 @@
-const {
-  eachSeries
-} = require('../db/async');
 const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
@@ -11,65 +8,18 @@ const {
   previewAndStageBatch,
   commitStagedBatch
 } = require('../services/importService');
-const ADMIN_USER = process.env.ADMIN_USER || 'admin';
-const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
+const { login, requireAdmin, logout, user } = require('../middleware/adminSession');
+router.post('/login', login);
+router.use(requireAdmin);
+router.get('/session', (req,res)=>res.json({user:user(req.admin.username),csrfToken:req.admin.csrfToken}));
+router.post('/logout', logout);
 
-/**
- * POST /api/admin/login
- * Authenticates admin credentials and returns session token
- */
-router.post('/login', async (req, res) => {
-  const {
-    username,
-    password
-  } = req.body;
-  const cleanUser = (username || '').trim().toLowerCase();
-  const cleanPass = (password || '').trim();
-  const isValidUser = cleanUser === ADMIN_USER.toLowerCase();
-  const isValidPass = !!ADMIN_TOKEN && cleanPass === ADMIN_TOKEN;
-  if (!isValidUser || !isValidPass) {
-    return res.status(401).json({
-      error: 'Invalid username or security key. Access denied.',
-      code: 'INVALID_CREDENTIALS'
-    });
-  }
-
-  // Record audit log entry for successful login
-  const db = getDb();
-  const now = new Date().toISOString();
-  try {
-    await db.run(`
-      INSERT INTO rinkcircuit.audit_logs (id, actor, action, entity_type, entity_id, details_json, created_at)
-      VALUES (?, ?, 'admin_login', 'auth_session', 'session', ?, ?)
-    `, `aud_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`, cleanUser, JSON.stringify({
-      ip: req.ip
-    }), now);
-  } catch (err) {
-    console.error('Failed to log admin login:', err);
-  }
-  res.json({
-    success: true,
-    token: ADMIN_TOKEN,
-    user: {
-      username: 'admin',
-      name: 'RinkCircuit Operations Admin',
-      role: 'Super Administrator'
-    }
-  });
+router.get('/imports', async (req, res) => {
+  res.json({ data: await getDb().all(`SELECT id, filename, total_rows, approved_rows, status, created_at
+    FROM rinkcircuit.import_batches ORDER BY created_at DESC LIMIT 50`) });
 });
 
-// Admin Authorization Middleware (Acceptance A12)
-function requireAdmin(req, res, next) {
-  const token = req.headers['x-admin-token'] || (req.headers.authorization ? req.headers.authorization.replace('Bearer ', '') : null);
-  if (!token || token !== ADMIN_TOKEN) {
-    return res.status(401).json({
-      error: 'Unauthorized access. Valid administrator credentials required.',
-      code: 'AUTH_REQUIRED'
-    });
-  }
-  next();
-}
-router.use(requireAdmin);
+router.get('/imports/:id', async (req,res)=>res.json(await require('../services/importService').getBatchReview(req.params.id)));
 
 /**
  * GET /api/admin/overview
@@ -87,22 +37,36 @@ router.get('/overview', async (req, res) => {
     ORDER BY last_checked_at ASC
   `, ninetyDaysAgo); // Demand reconciliation: Unique verified leads vs total submissions (Acceptance A20)
   const totalLeads = (await db.get("SELECT count(*) as c FROM rinkcircuit.leads")).c;
-  const verifiedLeads = (await db.get("SELECT count(*) as c FROM rinkcircuit.leads WHERE verification_status = 'verified'")).c;
-  const tentativeLeads = totalLeads - verifiedLeads;
+  const verifiedLeads = (await db.get("SELECT count(*) as c FROM rinkcircuit.leads l WHERE verification_status = 'verified' AND EXISTS (SELECT 1 FROM rinkcircuit.interests i WHERE i.lead_id=l.id AND i.moderation_status!='rejected')")).c;
+  const tentativeLeads = (await db.get("SELECT count(*) AS c FROM rinkcircuit.leads WHERE verification_status!='verified'")).c;
+  const excludedVerifiedLeads=totalLeads-verifiedLeads-tentativeLeads;
+  const analytics=await db.all('SELECT event_name,sum(count)::bigint AS count FROM rinkcircuit.analytics_daily GROUP BY event_name');
+  const rawSubmissions=Number(analytics.find(row=>row.event_name==='interest_submitted')?.count||0);
   // Demand by city
   const demandByCity = await db.all(`
-    SELECT city, count(*) as count
-    FROM rinkcircuit.interests
-    GROUP BY city
+    SELECT i.city, count(DISTINCT i.lead_id) as count
+    FROM rinkcircuit.interests i JOIN rinkcircuit.leads l ON l.id=i.lead_id
+    WHERE l.verification_status='verified' AND i.moderation_status!='rejected'
+    GROUP BY i.city
     ORDER BY count DESC
   `); // Demand by interest type
   const demandByType = await db.all(`
-    SELECT interest_type, count(*) as count
-    FROM rinkcircuit.interests
-    GROUP BY interest_type
+    SELECT i.interest_type, count(DISTINCT i.lead_id) as count
+    FROM rinkcircuit.interests i JOIN rinkcircuit.leads l ON l.id=i.lead_id
+    WHERE l.verification_status='verified' AND i.moderation_status!='rejected'
+    GROUP BY i.interest_type
   `); // Pending queues
+  const demandByNight=await db.all(`SELECT trim(n.night) AS night,count(DISTINCT i.lead_id) AS count
+    FROM rinkcircuit.interests i JOIN rinkcircuit.leads l ON l.id=i.lead_id
+    CROSS JOIN LATERAL unnest(string_to_array(i.preferred_nights,',')) AS n(night)
+    WHERE l.verification_status='verified' AND i.moderation_status!='rejected'
+      AND trim(n.night) IN ('Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday') GROUP BY trim(n.night)`);
+  const demandByEvent=await db.all(`SELECT i.event_id,count(DISTINCT i.lead_id) AS verified_leads,count(DISTINCT i.team_id) AS approved_teams
+    FROM rinkcircuit.interests i JOIN rinkcircuit.leads l ON l.id=i.lead_id WHERE l.verification_status='verified' AND i.moderation_status!='rejected' AND i.event_id IS NOT NULL GROUP BY i.event_id`);
+  const sourceCoverage=await db.get(`SELECT count(*) AS published,count(*) FILTER(WHERE EXISTS(SELECT 1 FROM rinkcircuit.source_evidence e WHERE e.programme_id=p.id)) AS with_evidence
+    FROM rinkcircuit.league_programmes p WHERE p.publication_status='published'`);
   const pendingRequests = (await db.get("SELECT count(*) as c FROM rinkcircuit.listing_requests WHERE status = 'pending'")).c;
-  const pendingTeamInterests = (await db.get("SELECT count(*) as c FROM rinkcircuit.interests WHERE interest_type = 'captain_team'")).c;
+  const pendingTeamInterests = (await db.get("SELECT count(*) as c FROM rinkcircuit.interests WHERE interest_type = 'captain_team' AND moderation_status = 'pending'")).c;
   res.json({
     counts: {
       totalLeagues: (await db.get("SELECT count(*) as c FROM rinkcircuit.league_programmes WHERE publication_status = 'published'")).c,
@@ -110,11 +74,15 @@ router.get('/overview', async (req, res) => {
       staleLeaguesCount: staleLeagues.length,
       pendingRequests,
       pendingTeamInterests,
+      rawSubmissions,
       totalLeads,
       verifiedLeads,
-      tentativeLeads
+      tentativeLeads,excludedVerifiedLeads
     },
     staleLeagues,
+    analytics,
+    analyticsDefinitions:{rawSubmissions:'Accepted interest requests, including successful retries, since metrics were enabled; not historical totals.',verifiedDemand:'Distinct verified leads with non-rejected interests per group; groups must not be summed as a global total.',referrals:'Consented outbound clicks; not registrations or paid entries.',approvedTeams:'Distinct linked approved team IDs per event; unlinked team-name submissions are not counted as verified teams.'},
+    sourceCoverage,demandByNight,demandByEvent,
     demandByCity,
     demandByType
   });
@@ -143,55 +111,7 @@ router.get('/requests', async (req, res) => {
     * POST /api/admin/requests/:id/decision
     * Decide on a listing request (Acceptance A13)
     */
-router.post('/requests/:id/decision', async (req, res) => {
-  const db = getDb();
-  const {
-    id
-  } = req.params;
-  const {
-    decision,
-    admin_notes,
-    actor = 'admin'
-  } = req.body;
-  if (!['approved', 'rejected'].includes(decision)) {
-    return res.status(400).json({
-      error: "Decision must be 'approved' or 'rejected'."
-    });
-  }
-  const request = await db.get("SELECT * FROM rinkcircuit.listing_requests WHERE id = ?", id);
-  if (!request) {
-    return res.status(404).json({
-      error: 'Request not found.'
-    });
-  }
-  const now = new Date().toISOString();
-  await db.transaction(async () => {
-    await db.run(`
-      UPDATE rinkcircuit.listing_requests
-      SET status = ?, admin_notes = ?, decision_date = ?
-      WHERE id = ?
-    `, decision, admin_notes || '', now, id); // If claim approved, mark programme claimed
-    if (decision === 'approved' && request.request_type === 'claim' && request.programme_id) {
-      await db.run(`
-        UPDATE rinkcircuit.league_programmes
-        SET claimed_status = 'claimed', verification_status = 'operator_confirmed', updated_at = ?
-        WHERE id = ?
-      `, now, request.programme_id);
-    }
-    await db.run(`
-      INSERT INTO rinkcircuit.audit_logs (id, actor, action, entity_type, entity_id, details_json, created_at)
-      VALUES (?, ?, ?, 'listing_request', ?, ?, ?)
-    `, `aud_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`, actor, `request_${decision}`, id, JSON.stringify({
-      decision,
-      admin_notes,
-      request_type: request.request_type
-    }), now);
-  });
-  res.json({
-    success: true,
-    message: `Request successfully ${decision}.`
-  });
-});
+router.post('/requests/:id/decision', async (req,res)=>res.json(await require('../services/moderationService').decideRequest(req.params.id,req.body,req.admin.username)));
 
 /**
  * GET /api/admin/teams/pending
@@ -202,12 +122,12 @@ router.get('/teams/pending', async (req, res) => {
   const pending = await db.all(`
     SELECT
       i.id, i.team_name, i.city, i.division, i.roster_size_estimate,
-      i.home_league_or_independent, i.additional_notes, i.created_at,
+      i.home_league_or_independent, i.additional_notes, i.created_at, i.publication_consent,
       l.id as lead_id, l.name as captain_name, l.email as captain_email,
       l.verification_status
     FROM rinkcircuit.interests i
     JOIN rinkcircuit.leads l ON i.lead_id = l.id
-    WHERE i.interest_type = 'captain_team'
+    WHERE i.interest_type = 'captain_team' AND i.moderation_status = 'pending'
     ORDER BY i.created_at DESC
   `);
   res.json({
@@ -217,58 +137,7 @@ router.get('/teams/pending', async (req, res) => {
     * POST /api/admin/teams/:id/decision
     * Approve captain submission into public team profile (Acceptance A15)
     */
-router.post('/teams/:id/decision', async (req, res) => {
-  const db = getDb();
-  const {
-    id
-  } = req.params;
-  const {
-    decision,
-    approved_name,
-    approved_city,
-    approved_division,
-    home_league_name,
-    actor = 'admin'
-  } = req.body;
-  const interest = await db.get("SELECT * FROM rinkcircuit.interests WHERE id = ?", id);
-  if (!interest) {
-    return res.status(404).json({
-      error: 'Interest submission not found.'
-    });
-  }
-  const now = new Date().toISOString();
-  if (decision === 'approved') {
-    const teamName = approved_name || interest.team_name;
-    const slug = teamName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-    const teamId = `team_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`;
-
-    // Acceptance A15: Public profile contains ONLY approved public fields. Captain email/phone are NOT stored on public team profile.
-    await db.run(`
-      INSERT INTO rinkcircuit.teams (id, name, slug, city, division_label, home_league_name, publication_status, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, 'published', ?, ?)
-    `, teamId, teamName, slug, approved_city || interest.city, approved_division || interest.division || 'Recreational', home_league_name || interest.home_league_or_independent || 'Independent', now, now);
-
-    // Link team_id on interest
-    await db.run("UPDATE rinkcircuit.interests SET team_id = ? WHERE id = ?", teamId, id);
-    await db.run(`
-      INSERT INTO rinkcircuit.audit_logs (id, actor, action, entity_type, entity_id, details_json, created_at)
-      VALUES (?, ?, 'approve_team_profile', 'team', ?, ?, ?)
-    `, `aud_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`, actor, teamId, JSON.stringify({
-      interest_id: id,
-      team_name: teamName
-    }), now);
-    return res.json({
-      success: true,
-      team_id: teamId,
-      slug,
-      message: 'Team profile published successfully.'
-    });
-  }
-  res.json({
-    success: true,
-    message: 'Team submission rejected.'
-  });
-});
+router.post('/teams/:id/decision', async (req,res)=>res.json(await require('../services/moderationService').decideTeam(req.params.id,req.body,req.admin.username)));
 
 /**
  * POST /api/admin/imports/preview
@@ -278,9 +147,11 @@ router.post('/imports/preview', async (req, res) => {
   const {
     filename = 'upload.csv',
     sourceName = 'Manual Upload',
-    rows
+    rows: providedRows, csv
   } = req.body;
-  if (!rows || !Array.isArray(rows) || rows.length === 0) {
+  let rows = providedRows;
+  if (csv !== undefined) rows = require('../services/importCsv').parseImportCsv(csv);
+  if (!Array.isArray(rows) || rows.length === 0 || rows.length > 1000 || rows.some(row => !row || typeof row !== 'object' || Array.isArray(row))) {
     return res.status(400).json({
       error: 'No data rows provided for import.'
     });
@@ -289,8 +160,8 @@ router.post('/imports/preview', async (req, res) => {
     const preview = await previewAndStageBatch(filename, sourceName, rows);
     res.json(preview);
   } catch (err) {
-    res.status(500).json({
-      error: err.message
+    res.status(400).json({
+      error: "Import could not be processed. Check the selected rows and source data."
     });
   }
 });
@@ -313,13 +184,19 @@ router.post('/imports/:id/commit', async (req, res) => {
     });
   }
   try {
-    const result = await commitStagedBatch(id, approvedRowIds, actor);
+    const versions = req.body.rowVersions;
+    if (!versions || approvedRowIds.some(rowId => !Number.isInteger(versions[rowId]))) return res.status(400).json({error:'Reload the preview before committing selected rows.'});
+    const result = await commitStagedBatch(id, approvedRowIds, actor, versions);
     res.json(result);
   } catch (err) {
-    res.status(500).json({
-      error: err.message
+    res.status(err.status || 500).json({
+      error: 'Import could not be committed. Existing data was preserved.'
     });
   }
+});
+
+router.post('/imports/:id/rows/:rowId/review', async (req,res) => {
+  res.json(await require('../services/importService').reviewImportRow(req.params.id,req.params.rowId,req.body,req.admin.username));
 });
 
 /**
@@ -345,6 +222,10 @@ router.patch('/leagues/:id', async (req, res) => {
     last_checked_at,
     actor = 'admin'
   } = req.body;
+  if(publication_status!==undefined&&!['draft','review','published','archived'].includes(publication_status))return res.status(400).json({error:'Invalid publication status.'});
+  if(verification_status!==undefined&&!['unverified','research_checked','operator_confirmed','needs_review'].includes(verification_status))return res.status(400).json({error:'Invalid verification status.'});
+  if(newSlug!==undefined&&(typeof newSlug!=='string'||newSlug.length>160||!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(newSlug)))return res.status(400).json({error:'Use a lowercase, hyphen-separated slug.'});
+  for(const value of [name,municipality,area,category,description,owner_disclosure])if(value!==undefined&&(typeof value!=='string'||value.length>5000))return res.status(400).json({error:'Invalid editorial text.'});
   const current = await db.get("SELECT * FROM rinkcircuit.league_programmes WHERE id = ?", id);
   if (!current) {
     return res.status(404).json({
@@ -353,7 +234,7 @@ router.patch('/leagues/:id', async (req, res) => {
   }
 
   // Acceptance A21: Optimistic concurrency check
-  if (version !== undefined && Number(version) !== current.version) {
+  if (!Number.isInteger(Number(version)) || Number(version) !== current.version) {
     return res.status(409).json({
       error: 'Conflict: This record was modified concurrently by another user or process.',
       code: 'STALE_WRITE_CONFLICT',
@@ -362,6 +243,12 @@ router.patch('/leagues/:id', async (req, res) => {
   }
   const now = new Date().toISOString();
   await db.transaction(async () => {
+    if(newSlug&&newSlug!==current.slug){
+      const reserved=await db.get('SELECT old_slug FROM rinkcircuit.slug_redirects WHERE old_slug=?',newSlug);
+      const occupied=await db.get('SELECT id FROM rinkcircuit.league_programmes WHERE slug=? AND id!=?',newSlug,id);
+      if(reserved||occupied){const error=new Error('Slug is already in use or reserved by redirect history.');error.status=409;throw error;}
+      await db.run("UPDATE rinkcircuit.slug_redirects SET new_slug=? WHERE new_slug=? AND entity_type='league_programme'",newSlug,current.slug);
+    }
     // Acceptance A18: If slug changed, insert redirect
     if (newSlug && newSlug !== current.slug) {
       await db.run(`
@@ -370,7 +257,7 @@ router.patch('/leagues/:id', async (req, res) => {
         ON CONFLICT (old_slug) DO UPDATE SET new_slug = EXCLUDED.new_slug, created_at = EXCLUDED.created_at
       `, current.slug, newSlug, now);
     }
-    await db.run(`
+    const update = await db.run(`
       UPDATE rinkcircuit.league_programmes
       SET name = COALESCE(?, name),
           slug = COALESCE(?, slug),
@@ -384,8 +271,9 @@ router.patch('/leagues/:id', async (req, res) => {
           last_checked_at = COALESCE(?, last_checked_at),
           version = version + 1,
           updated_at = ?
-      WHERE id = ?
-    `, name, newSlug, municipality, area, category, description, publication_status, verification_status, owner_disclosure, last_checked_at, now, id);
+      WHERE id = ? AND version = ?
+    `, name, newSlug, municipality, area, category, description, publication_status, verification_status, owner_disclosure, last_checked_at, now, id, Number(version));
+    if (!update.changes) { const error = new Error("This record was modified concurrently."); error.status = 409; throw error; }
     await db.run(`
       INSERT INTO rinkcircuit.audit_logs (id, actor, action, entity_type, entity_id, details_json, created_at)
       VALUES (?, ?, 'update_league', 'league_programme', ?, ?, ?)
@@ -423,12 +311,15 @@ router.get('/audit', async (req, res) => {
  */
 router.get('/backup', async (req, res) => {
   const { exportBackup } = require('../db/backup');
-  res.json(await exportBackup());
+  const backup=await exportBackup();
+  await getDb().run("INSERT INTO rinkcircuit.audit_logs(id,actor,action,entity_type,entity_id,details_json,created_at) VALUES (?,?,'backup_export','database','rinkcircuit','{}',?)",crypto.randomUUID(),req.admin.username,new Date().toISOString());
+  res.set('Cache-Control','no-store').json(backup);
 });
 
 router.post('/restore', async (req, res) => {
   const { restoreBackup } = require('../db/backup');
   await restoreBackup(req.body.data);
+  await getDb().run('DELETE FROM rinkcircuit.admin_sessions');
   res.json({ success: true, message: 'All application records and relationships restored.' });
 });
 

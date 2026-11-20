@@ -1,25 +1,34 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import OutboundModal from './components/OutboundModal';
 import CorrectionModal from './components/CorrectionModal';
 
-import HomePage from './pages/HomePage';
-import LeagueFinderPage from './pages/LeagueFinderPage';
-import LeagueProfilePage from './pages/LeagueProfilePage';
-import CityGuidePage from './pages/CityGuidePage';
-import CaptainsClubPage from './pages/CaptainsClubPage';
-import TeamsDirectoryPage from './pages/TeamsDirectoryPage';
-import TeamProfilePage from './pages/TeamProfilePage';
-import TournamentsPage from './pages/TournamentsPage';
-import OperatorsPage from './pages/OperatorsPage';
-import RequestALeaguePage from './pages/RequestALeaguePage';
-import VerifyEmailPage from './pages/VerifyEmailPage';
-import AdminDashboardPage from './pages/AdminDashboardPage';
-import { PrivacyPage, TermsPage, ContactPage } from './pages/PolicyPages';
+const HomePage = lazy(()=>import('./pages/HomePage'));
+const LeagueFinderPage = lazy(()=>import('./pages/LeagueFinderPage'));
+const LeagueProfilePage = lazy(()=>import('./pages/LeagueProfilePage'));
+const CityGuidePage = lazy(()=>import('./pages/CityGuidePage'));
+const CaptainsClubPage = lazy(()=>import('./pages/CaptainsClubPage'));
+const TeamsDirectoryPage = lazy(()=>import('./pages/TeamsDirectoryPage'));
+const TeamProfilePage = lazy(()=>import('./pages/TeamProfilePage'));
+const TournamentsPage = lazy(()=>import('./pages/TournamentsPage'));
+const EventDetailPage = lazy(()=>import('./pages/EventDetailPage'));
+const OperatorsPage = lazy(()=>import('./pages/OperatorsPage'));
+const RequestALeaguePage = lazy(()=>import('./pages/RequestALeaguePage'));
+const VerifyEmailPage = lazy(()=>import('./pages/VerifyEmailPage'));
+const AdminDashboardPage = lazy(()=>import('./pages/AdminDashboardPage'));
+const PrivacyPage=lazy(()=>import('./pages/PolicyPages').then(m=>({default:m.PrivacyPage})));
+const TermsPage=lazy(()=>import('./pages/PolicyPages').then(m=>({default:m.TermsPage})));
+const ContactPage=lazy(()=>import('./pages/PolicyPages').then(m=>({default:m.ContactPage})));
+import {setMetadata} from './lib/metadata';
 
 export default function App() {
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
+
+  useEffect(()=>{
+    const titles={'/':'Adult Hockey Directory','/leagues':'League Finder','/teams':'Teams','/tournaments':'Events','/admin':'Operations Console'};
+    setMetadata((titles[currentPath]||'RinkCircuit')+' | RinkCircuit',['/','/leagues','/teams','/tournaments'].includes(currentPath));
+  },[currentPath]);
 
   // Global modals
   const [outboundTarget, setOutboundTarget] = useState(null); // { url, name }
@@ -36,11 +45,12 @@ export default function App() {
   function navigate(path) {
     window.history.pushState(null, '', path);
     setCurrentPath(path.split('?')[0]);
+    window.dispatchEvent(new Event('rinkcircuit:navigate'));
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function handleExternalClick(url, name) {
-    setOutboundTarget({ url, name });
+  function handleExternalClick(url, name, eventType='official_link_clicked') {
+    setOutboundTarget({ url, name, eventType });
   }
 
   function handleOpenCorrection(programmeId, programmeName) {
@@ -107,6 +117,11 @@ export default function App() {
       return <TournamentsPage navigate={navigate} onExternalClick={handleExternalClick} />;
     }
 
+    if (currentPath.startsWith('/tournaments/')) {
+      const slug = currentPath.slice('/tournaments/'.length);
+      return <EventDetailPage slug={slug} navigate={navigate} onExternalClick={handleExternalClick} />;
+    }
+
     // 9. For Operators
     if (currentPath === '/operators') {
       return <OperatorsPage navigate={navigate} onOpenCorrection={handleOpenCorrection} />;
@@ -164,9 +179,10 @@ export default function App() {
   return (
     <div className="min-h-screen flex flex-col justify-between bg-[#F5F8FA] text-[#12202B]">
       <div>
+        <a href="#main-content" className="sr-only focus:not-sr-only focus:block focus:p-3">Skip to main content</a>
         <Navbar currentPath={currentPath} navigate={navigate} />
-        <main className="animate-in fade-in duration-150">
-          {renderPage()}
+        <main id="main-content" tabIndex={-1} className="animate-in fade-in duration-150">
+          <Suspense fallback={<p role="status" className="p-8">Loading page?</p>}>{renderPage()}</Suspense>
         </main>
       </div>
 
@@ -179,6 +195,7 @@ export default function App() {
           onClose={() => setOutboundTarget(null)}
           targetUrl={outboundTarget.url}
           targetName={outboundTarget.name}
+          eventType={outboundTarget.eventType}
         />
       )}
 

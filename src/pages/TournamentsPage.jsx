@@ -1,280 +1,170 @@
-import React, { useState, useEffect } from 'react';
-import { Trophy, Calendar, MapPin, DollarSign, Award, ArrowUpRight, CheckCircle2, AlertCircle } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { AlertCircle, ArrowUpRight, Award, Calendar, MapPin, Trophy } from 'lucide-react';
+import EventInterestModal from '../components/EventInterestModal';
+
+function formatEventDate(value, timeZone) {
+  if (!value) return 'Not confirmed';
+  const datePart = String(value).slice(0, 10);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(datePart)) return 'Not confirmed';
+  const date = new Date(`${datePart}T12:00:00Z`);
+  if (Number.isNaN(date.getTime())) return 'Not confirmed';
+  try {
+    return new Intl.DateTimeFormat(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      timeZone: timeZone || 'UTC'
+    }).format(date);
+  } catch {
+    return new Intl.DateTimeFormat(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      timeZone: 'UTC'
+    }).format(date);
+  }
+}
+
+function formatPrice(event) {
+  if (event.price_amount === null || event.price_amount === undefined) return 'Price not confirmed';
+  const amount = Number(event.price_amount);
+  if (!Number.isFinite(amount)) return 'Price not confirmed';
+  return `${event.price_currency ? `${event.price_currency} ` : ''}$${amount.toLocaleString()}${event.price_unit ? ` (${event.price_unit})` : ''}`;
+}
+
+const stateBadges = {
+  'registration-open': { label: 'Registration Open', bg: 'bg-emerald-100 text-emerald-800' },
+  announced: { label: 'Announced', bg: 'bg-amber-100 text-amber-800' },
+  'interest-only': { label: 'Interest Only', bg: 'bg-amber-100 text-amber-800' },
+  'registration-closed': { label: 'Registration Closed', bg: 'bg-slate-200 text-slate-800' },
+  full: { label: 'Full', bg: 'bg-slate-200 text-slate-800' },
+  completed: { label: 'Completed', bg: 'bg-slate-100 text-slate-600' },
+  cancelled: { label: 'Cancelled', bg: 'bg-slate-100 text-slate-600' }
+};
 
 export default function TournamentsPage({ navigate, onExternalClick }) {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedEventForInterest, setSelectedEventForInterest] = useState(null);
-  const [interestEmail, setInterestEmail] = useState('');
-  const [interestName, setInterestName] = useState('');
-  const [interestTeam, setInterestTeam] = useState('');
-  const [submittingInterest, setSubmittingInterest] = useState(false);
-  const [interestReceipt, setInterestReceipt] = useState(null);
-  const [interestError, setInterestError] = useState(null);
+  const [error, setError] = useState(null);
+  const [retry, setRetry] = useState(0);
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   useEffect(() => {
+    const controller = new AbortController();
     async function fetchEvents() {
       setLoading(true);
+      setError(null);
       try {
-        const res = await fetch('/api/events');
-        const data = await res.json();
-        setEvents(data.data || []);
-      } catch (err) {
-        console.error('Failed to load events:', err);
+        const response = await fetch('/api/events', { signal: controller.signal });
+        if (!response.ok) throw new Error('Unable to load published events.');
+        const data = await response.json();
+        if (!controller.signal.aborted) setEvents(data.data || []);
+      } catch (fetchError) {
+        if (!controller.signal.aborted) {
+          setEvents([]);
+          setError(fetchError.message);
+        }
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     }
     fetchEvents();
-  }, []);
-
-  async function handleInterestSubmit(e) {
-    e.preventDefault();
-    setSubmittingInterest(true);
-    setInterestError(null);
-
-    try {
-      const res = await fetch('/api/interests', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          interest_type: 'tournament',
-          event_id: selectedEventForInterest.id,
-          email: interestEmail,
-          name: interestName,
-          team_name: interestTeam,
-          city: selectedEventForInterest.city
-        })
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to submit event interest');
-
-      setInterestReceipt(data);
-    } catch (err) {
-      setInterestError(err.message);
-    } finally {
-      setSubmittingInterest(false);
-    }
-  }
-
-  const stateBadges = {
-    'registration-open': { label: 'Registration Open', bg: 'bg-emerald-100 text-emerald-800' },
-    'interest-only': { label: 'Interest Only / TBA', bg: 'bg-amber-100 text-amber-800' },
-    'full': { label: 'Sold Out / Full', bg: 'bg-slate-200 text-slate-800' },
-    'completed': { label: 'Completed', bg: 'bg-slate-100 text-slate-600' }
-  };
+    return () => controller.abort();
+  }, [retry]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* Header */}
-      <div className="space-y-2">
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-          Adult Hockey Tournaments & Events
-        </h1>
-        <p className="text-xs sm:text-sm text-slate-500">
-          Published weekend invitationals, showcase cups, and Plaionn Champions League qualification tournaments across the GTA.
-        </p>
-      </div>
+      <header className="space-y-2">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Adult Hockey Tournaments & Events</h1>
+        <p className="text-sm text-slate-600">Review published event details. Dates, prices, eligibility, and registration are shown only when confirmed.</p>
+      </header>
 
-      {/* Events Grid */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-pulse">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="bg-white rounded-2xl h-64 border border-slate-200"></div>
-          ))}
+        <p role="status" className="text-sm text-slate-600">Loading published events…</p>
+      ) : error ? (
+        <div role="alert" className="bg-white rounded-xl border border-red-200 p-6 space-y-3">
+          <div className="flex items-center gap-2 text-red-800"><AlertCircle className="w-5 h-5" /><p>{error}</p></div>
+          <button type="button" onClick={() => setRetry(value => value + 1)} className="text-sm font-semibold text-blue-700 underline">Retry</button>
         </div>
       ) : events.length === 0 ? (
         <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-3">
-          <Trophy className="w-10 h-10 text-slate-400 mx-auto" />
-          <h3 className="font-bold text-slate-800 text-base">No Upcoming Tournaments Published</h3>
-          <p className="text-xs text-slate-500 max-w-sm mx-auto">
-            New tournaments are scheduled seasonally. Register your interest for first access to registrations.
-          </p>
+          <Trophy aria-hidden="true" className="w-10 h-10 text-slate-400 mx-auto" />
+          <h2 className="font-bold text-slate-800 text-base">No Events Published</h2>
+          <p className="text-sm text-slate-600 max-w-sm mx-auto">There are no published event listings at this time. Check back for updates.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {events.map((evt) => {
-            const badge = stateBadges[evt.lifecycle_state] || { label: evt.lifecycle_state, bg: 'bg-slate-100 text-slate-700' };
-            const isInterestOnly = evt.lifecycle_state === 'interest-only';
+          {events.map(event => {
+            const badge = stateBadges[event.lifecycle_state] || { label: 'Status not confirmed', bg: 'bg-slate-100 text-slate-700' };
+            const interestAvailable = ['announced', 'interest-only'].includes(event.lifecycle_state);
+            const registrationAvailable = event.lifecycle_state === 'registration-open' && !!event.registration_url;
 
             return (
-              <div
-                key={evt.id}
-                className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4"
-              >
-                <div className="space-y-3">
-                  <div className="flex justify-between items-start gap-2">
-                    <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider ${badge.bg}`}>
-                      {badge.label}
-                    </span>
-
-                    <span className="text-xs font-bold text-slate-800">
-                      {evt.price_amount ? `$${evt.price_amount.toLocaleString()} ${evt.price_currency || 'CAD'} (${evt.price_unit})` : 'TBA'}
-                    </span>
+              <article key={event.id} className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col justify-between gap-5">
+                <div className="space-y-4">
+                  <div className="flex flex-wrap justify-between items-start gap-2">
+                    <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${badge.bg}`}>{badge.label}</span>
+                    <span className="text-sm font-semibold text-slate-800">{formatPrice(event)}</span>
                   </div>
+                  <h2 className="text-lg font-bold text-slate-900 leading-snug">
+                    <a href={`/tournaments/${event.slug}`} onClick={click => {
+                      if (click.button === 0 && !click.metaKey && !click.ctrlKey && !click.shiftKey && !click.altKey) {
+                        click.preventDefault();
+                        navigate(`/tournaments/${event.slug}`);
+                      }
+                    }} className="hover:text-blue-700 underline-offset-2 hover:underline">
+                      {event.title}
+                    </a>
+                  </h2>
+                  {event.description && <p className="text-sm text-slate-600 leading-relaxed">{event.description}</p>}
 
-                  <h3 className="text-lg font-bold text-slate-900 leading-snug">
-                    {evt.title}
-                  </h3>
-
-                  <p className="text-xs text-slate-600 leading-relaxed">
-                    {evt.description}
-                  </p>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-600 pt-2 border-t border-slate-100">
-                    <div className="flex items-center gap-1.5">
-                      <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                      <span>{evt.start_date ? new Date(evt.start_date).toLocaleDateString() : 'Dates TBA'}</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-600 pt-3 border-t border-slate-100">
+                    <div className="flex items-start gap-2">
+                      <Calendar aria-hidden="true" className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
+                      <dl><dt className="font-medium text-slate-700">Dates</dt><dd>{formatEventDate(event.start_date, event.timezone)}{event.end_date && event.end_date !== event.start_date ? ` – ${formatEventDate(event.end_date, event.timezone)}` : ''}</dd></dl>
                     </div>
-
-                    <div className="flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                      <span>{evt.location_name || evt.city}</span>
+                    <div className="flex items-start gap-2">
+                      <MapPin aria-hidden="true" className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
+                      <dl><dt className="font-medium text-slate-700">Location</dt><dd>{event.location_name || event.city || 'Not confirmed'}</dd></dl>
                     </div>
-
-                    <div className="flex items-center gap-1.5">
-                      <Award className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                      <span className="truncate">{evt.divisions || 'Recreational Divisions'}</span>
+                    <div className="flex items-start gap-2">
+                      <Award aria-hidden="true" className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
+                      <dl><dt className="font-medium text-slate-700">Divisions</dt><dd>{event.divisions || 'Not confirmed'}</dd></dl>
                     </div>
-
-                    <div className="flex items-center gap-1.5">
-                      <Trophy className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                      <span>{evt.guaranteed_games ? `${evt.guaranteed_games} Games Guaranteed` : 'Format TBA'}</span>
+                    <div className="flex items-start gap-2">
+                      <Trophy aria-hidden="true" className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
+                      <dl><dt className="font-medium text-slate-700">Guaranteed games</dt><dd>{event.guaranteed_games ?? 'Not confirmed'}</dd></dl>
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                  {evt.registration_url && !isInterestOnly ? (
-                    <button
-                      onClick={() => onExternalClick(evt.registration_url, evt.title)}
-                      className="bg-[#1463DF] hover:bg-blue-700 text-white font-semibold text-xs px-4 py-2 rounded-lg shadow transition-colors flex items-center gap-1.5"
-                    >
-                      <span>Register on Official Site</span>
-                      <ArrowUpRight className="w-3.5 h-3.5" />
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => {
-                        setSelectedEventForInterest(evt);
-                        setInterestReceipt(null);
-                        setInterestError(null);
-                      }}
-                      className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs px-4 py-2 rounded-lg shadow transition-colors"
-                    >
-                      Register Event Interest
-                    </button>
-                  )}
-
-                  <span className="text-[11px] text-slate-400">
-                    Deadline: {evt.registration_deadline ? new Date(evt.registration_deadline).toLocaleDateString() : 'TBA'}
-                  </span>
+                <div className="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex flex-wrap gap-2">
+                    <a href={`/tournaments/${event.slug}`} onClick={click => {
+                      if (click.button === 0 && !click.metaKey && !click.ctrlKey && !click.shiftKey && !click.altKey) {
+                        click.preventDefault();
+                        navigate(`/tournaments/${event.slug}`);
+                      }
+                    }} className="px-3 py-2 text-sm font-semibold text-blue-700 border border-blue-200 rounded-lg hover:bg-blue-50">
+                      View Event Details
+                    </a>
+                    {registrationAvailable && (
+                      <button type="button" onClick={() => onExternalClick(event.registration_url, event.title, 'external_registration_clicked')} className="px-3 py-2 text-sm font-semibold text-white bg-[#1463DF] rounded-lg flex items-center gap-1.5">
+                        Official Registration <ArrowUpRight className="w-4 h-4" />
+                      </button>
+                    )}
+                    {interestAvailable && <button type="button" onClick={() => setSelectedEvent(event)} className="px-3 py-2 text-sm font-semibold text-amber-950 bg-amber-100 rounded-lg hover:bg-amber-200">Express Interest</button>}
+                    {event.lifecycle_state === 'registration-open' && !registrationAvailable && <span className="text-sm text-slate-600 self-center">Official registration details are not available.</span>}
+                  </div>
+                  <span className="text-xs text-slate-500">Deadline: {formatEventDate(event.registration_deadline, event.timezone)}</span>
                 </div>
-              </div>
+              </article>
             );
           })}
         </div>
       )}
 
-      {/* Event Interest Modal */}
-      {selectedEventForInterest && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in-95 duration-150">
-            <button
-              onClick={() => setSelectedEventForInterest(null)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1"
-            >
-              ✕
-            </button>
-
-            {interestReceipt ? (
-              <div className="text-center py-4 space-y-3">
-                <CheckCircle2 className="w-10 h-10 text-emerald-600 mx-auto" />
-                <h3 className="font-bold text-slate-900 text-base">Interest Recorded</h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  {interestReceipt.message}
-                </p>
-                <button
-                  onClick={() => setSelectedEventForInterest(null)}
-                  className="px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-lg"
-                >
-                  Close
-                </button>
-              </div>
-            ) : (
-              <form onSubmit={handleInterestSubmit} className="space-y-4 text-xs">
-                <div>
-                  <h3 className="font-bold text-slate-900 text-base">
-                    Register Tournament Interest
-                  </h3>
-                  <p className="text-xs text-slate-500 truncate mt-0.5">
-                    {selectedEventForInterest.title}
-                  </p>
-                </div>
-
-                {interestError && (
-                  <div className="bg-red-50 text-red-800 p-2.5 rounded-lg border border-red-200">
-                    {interestError}
-                  </div>
-                )}
-
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Your Name *</label>
-                  <input
-                    type="text"
-                    required
-                    value={interestName}
-                    onChange={(e) => setInterestName(e.target.value)}
-                    placeholder="e.g. Wayne Gretzky"
-                    className="w-full px-3 py-2 rounded-lg border border-slate-300"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Email Address *</label>
-                  <input
-                    type="email"
-                    required
-                    value={interestEmail}
-                    onChange={(e) => setInterestEmail(e.target.value)}
-                    placeholder="you@example.com"
-                    className="w-full px-3 py-2 rounded-lg border border-slate-300"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Team Name (if captain)</label>
-                  <input
-                    type="text"
-                    value={interestTeam}
-                    onChange={(e) => setInterestTeam(e.target.value)}
-                    placeholder="e.g. North York Knights"
-                    className="w-full px-3 py-2 rounded-lg border border-slate-300"
-                  />
-                </div>
-
-                <div className="pt-2 flex justify-end gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setSelectedEventForInterest(null)}
-                    className="px-3 py-2 text-slate-600 hover:bg-slate-100 rounded-lg"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={submittingInterest}
-                    className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50"
-                  >
-                    {submittingInterest ? 'Submitting...' : 'Submit Interest'}
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
-        </div>
-      )}
+      {selectedEvent && <EventInterestModal event={selectedEvent} onClose={() => setSelectedEvent(null)} />}
     </div>
   );
 }

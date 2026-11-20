@@ -9,13 +9,6 @@ export default function FilterSidebar({ filters, setFilters, onReset, totalMatch
 
   const nights = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-  const levels = [
-    { label: 'Tier 1 — Elite / Former Junior', val: 'Tier 1' },
-    { label: 'Tier 2 — Advanced Amateur', val: 'Tier 2' },
-    { label: 'Tier 3 — Competitive Rec', val: 'Tier 3' },
-    { label: 'Tier 4 — Recreational', val: 'Tier 4' },
-    { label: 'Masters (35+ / 40+ / Oldtimers)', val: 'Masters' }
-  ];
 
   function toggleCity(city) {
     const current = filters.city ? filters.city.split(',').map(c => c.trim()).filter(Boolean) : [];
@@ -29,7 +22,7 @@ export default function FilterSidebar({ filters, setFilters, onReset, totalMatch
   }
 
   function hasActiveFilters() {
-    return !!(filters.q || filters.city || filters.night || filters.level || filters.reg || filters.sport);
+    return !!(filters.q || filters.city || filters.night || filters.level || filters.reg || filters.sport !== 'ice_hockey' || filters.season || filters.category || filters.age);
   }
 
   return (
@@ -60,12 +53,22 @@ export default function FilterSidebar({ filters, setFilters, onReset, totalMatch
 
       {/* Sport Category Switcher */}
       <div>
-        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-          Sport Type
-        </label>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Sport Type</div>
+        <div className="grid grid-cols-3 gap-2" role="group" aria-label="Sport type">
           <button
-            onClick={() => setFilters({ ...filters, sport: filters.sport === 'ice_hockey' ? '' : 'ice_hockey' })}
+            type="button"
+            aria-pressed={filters.sport === 'all'}
+            onClick={() => setFilters({ ...filters, sport: 'all' })}
+            className={`py-1.5 px-2 rounded-lg text-xs font-semibold border text-center transition-colors ${
+              filters.sport === 'all' ? 'bg-blue-600 text-white border-blue-600' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+            }`}
+          >
+            All
+          </button>
+          <button
+            type="button"
+            aria-pressed={filters.sport === 'ice_hockey'}
+            onClick={() => setFilters({ ...filters, sport: 'ice_hockey' })}
             className={`py-1.5 px-3 rounded-lg text-xs font-semibold border text-center transition-colors ${
               filters.sport === 'ice_hockey'
                 ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
@@ -75,7 +78,9 @@ export default function FilterSidebar({ filters, setFilters, onReset, totalMatch
             Ice Hockey
           </button>
           <button
-            onClick={() => setFilters({ ...filters, sport: filters.sport === 'ball_hockey' ? '' : 'ball_hockey' })}
+            type="button"
+            aria-pressed={filters.sport === 'ball_hockey'}
+            onClick={() => setFilters({ ...filters, sport: 'ball_hockey' })}
             className={`py-1.5 px-3 rounded-lg text-xs font-semibold border text-center transition-colors ${
               filters.sport === 'ball_hockey'
                 ? 'bg-orange-600 text-white border-orange-600 shadow-sm'
@@ -86,6 +91,15 @@ export default function FilterSidebar({ filters, setFilters, onReset, totalMatch
           </button>
         </div>
       </div>
+
+      <label className="block text-xs font-bold text-slate-700">
+        Programme Category
+        <input className="block w-full border rounded p-2 mt-2 font-normal" value={filters.category || ''} onChange={e => setFilters({ ...filters, category: e.target.value })} placeholder="e.g. Adult recreational" />
+      </label>
+      <label className="block text-xs font-bold text-slate-700">
+        Age Eligibility
+        <input className="block w-full border rounded p-2 mt-2 font-normal" value={filters.age || ''} onChange={e => setFilters({ ...filters, age: e.target.value })} placeholder="Use the programme's wording" />
+      </label>
 
       {/* Municipality / Area */}
       <div>
@@ -124,6 +138,7 @@ export default function FilterSidebar({ filters, setFilters, onReset, totalMatch
             const isSelected = filters.night === n;
             return (
               <button
+                type="button"
                 key={n}
                 onClick={() => setFilters({ ...filters, night: isSelected ? '' : n })}
                 className={`text-xs px-2.5 py-1 rounded-md border transition-colors ${
@@ -139,31 +154,13 @@ export default function FilterSidebar({ filters, setFilters, onReset, totalMatch
         </div>
       </div>
 
-      {/* Skill / Division Level */}
-      <div>
-        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-          Skill Tier
-        </label>
-        <div className="space-y-1 text-xs">
-          {levels.map((lvl) => {
-            const isSelected = filters.level === lvl.val;
-            return (
-              <button
-                key={lvl.val}
-                onClick={() => setFilters({ ...filters, level: isSelected ? '' : lvl.val })}
-                className={`w-full text-left px-2.5 py-1.5 rounded-lg border text-xs transition-colors flex items-center justify-between ${
-                  isSelected
-                    ? 'bg-blue-50 text-blue-800 border-blue-300 font-semibold'
-                    : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
-                }`}
-              >
-                <span>{lvl.label}</span>
-                {isSelected && <span className="text-blue-600 font-bold">✓</span>}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      <label className="block text-xs font-bold text-slate-700">Season
+        <input className="block w-full border rounded p-2 mt-2" value={filters.season||''} onChange={e=>setFilters({...filters,season:e.target.value})} placeholder="e.g. Winter 2026/27" />
+      </label>
+      <label className="block text-xs font-bold text-slate-700">Operator's level or division label
+        <input className="block w-full border rounded p-2 mt-2" value={filters.level||''} onChange={e=>setFilters({...filters,level:e.target.value})} placeholder="Use the league's own label" />
+        <span className="font-normal">Labels are not equivalent across leagues.</span>
+      </label>
 
       {/* Registration Mode */}
       <div>
@@ -173,10 +170,11 @@ export default function FilterSidebar({ filters, setFilters, onReset, totalMatch
         <div className="space-y-1 text-xs">
           {[
             { label: 'All Formats', val: '' },
-            { label: 'Individual Free Agents Welcome', val: 'Individual' },
-            { label: 'Full Team Entry', val: 'Team only' }
+            { label: 'Individual entry', val: 'Individual' },
+            { label: 'Full Team Entry', val: 'Team' }
           ].map((mode) => (
             <button
+              type="button"
               key={mode.val}
               onClick={() => setFilters({ ...filters, reg: mode.val })}
               className={`w-full text-left px-2.5 py-1.5 rounded-lg border text-xs transition-colors ${

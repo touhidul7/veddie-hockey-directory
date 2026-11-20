@@ -1,0 +1,25 @@
+const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');const express=require('express');const {chromium}=require('@playwright/test');const AxeBuilder=require('@axe-core/playwright').default;
+let server,browser;const report={date:'2026-11-20',scope:'Mock public data in local production build; automated checks do not replace screen-reader user testing',layouts:[],accessibility:[],errors:[]};
+async function run(){const app=express();app.use(express.static(path.join(__dirname,'../dist')));app.use((req,res)=>res.sendFile(path.join(__dirname,'../dist/index.html')));server=app.listen(0,'127.0.0.1');await new Promise(r=>server.once('listening',r));const base='http://127.0.0.1:'+server.address().port;
+browser=await chromium.launch({channel:'msedge',headless:true});const context=await browser.newContext();const page=await context.newPage();page.on('pageerror',e=>report.errors.push(e.message));
+const league={id:'qa',name:'QA Adult Hockey',slug:'qa-hockey',municipality:'Toronto',area:'Toronto',category:'Adult ice',sport_type:'ice_hockey',verification_status:'research_checked',offerings:[{id:'qa-off',season_label:null,nights:[],arenas:[],registration_status:'unknown',registration_url:'https://example.com/hockey',fee_amount:null}],evidence:[{id:'ev',url:'https://example.com/hockey',checked_at:null}],related:[]};
+const event={id:'qa-event',title:'QA Interest Event',slug:'qa-event',event_type:'tournament',lifecycle_state:'interest-only',city:'Toronto',divisions:null,price_amount:null,start_date:null,end_date:null};
+await page.route('**/api/**',async route=>{const url=new URL(route.request().url());let body={data:[]};let status=200;
+if(url.pathname==='/api/admin/session'){status=401;body={error:'Login required'};}
+else if(url.pathname==='/api/leagues')body={data:url.searchParams.get('q')==='no-match'?[]:[league],pagination:{total:url.searchParams.get('q')==='no-match'?0:1,limit:50,offset:0}};
+else if(url.pathname==='/api/leagues/qa-hockey')body={data:league};
+else if(url.pathname==='/api/events')body={data:[event]};
+else if(url.pathname==='/api/events/qa-event')body={data:event};
+else if(url.pathname==='/api/locations')body={data:[{key:'toronto',name:'Toronto',province:'ON',region:'Toronto',leagueCount:1}]};
+else if(url.pathname==='/api/locations/on/toronto')body={data:{meta:{name:'Toronto',headline:'Adult Hockey in Toronto',description:'Published programme records',arenas:[]},leagues:[league],totalLeagues:1}};
+await route.fulfill({status,contentType:'application/json',body:JSON.stringify(body)});});
+const routes=['/','/leagues','/leagues/qa-hockey','/locations/on/toronto','/tournaments','/tournaments/qa-event','/teams','/captains','/request-a-league','/admin','/privacy'];
+for(const width of [360,768,1440]){await page.setViewportSize({width,height:1000});for(const route of routes){await page.goto(base+route);await page.waitForTimeout(400);const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1);report.layouts.push({width,route,overflow});if(width===360){const result=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();report.accessibility.push({route,violations:result.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.map(n=>({target:n.target,summary:n.failureSummary}))}))});}}}
+await page.setViewportSize({width:360,height:1000});await page.goto(base+'/leagues');await page.getByRole('button',{name:/Filters/}).first().click();await page.getByRole('dialog').waitFor();await page.keyboard.press('Escape');await page.getByRole('dialog').waitFor({state:'detached'});
+await page.goto(base+'/leagues/qa-hockey');await page.getByRole('button',{name:/Official|Register/i}).first().click();await page.getByRole('dialog',{name:'External website notice'}).waitFor();for(let n=0;n<8;n++)await page.keyboard.press('Tab');assert.equal(await page.evaluate(()=>document.querySelector('[role="dialog"]').contains(document.activeElement)),true);await page.keyboard.press('Escape');
+report.keyboard='Filter and outbound dialog Escape/focus containment passed';fs.mkdirSync('artifacts/qa',{recursive:true});await page.screenshot({path:'artifacts/qa/profile-360.png',fullPage:true});
+report.layoutFailures=report.layouts.filter(x=>x.overflow);report.serious=report.accessibility.flatMap(row=>row.violations.filter(v=>['serious','critical'].includes(v.impact)).map(v=>({route:row.route,...v})));
+console.log(JSON.stringify({layouts:report.layouts.length,overflow:report.layoutFailures,errors:report.errors,accessibility:report.serious},null,2));
+assert.equal(report.layoutFailures.length,0);assert.equal(report.errors.length,0);assert.equal(report.serious.length,0,'Serious accessibility findings remain');
+}
+run().catch(e=>{report.error=e.message;console.error(e.message);process.exitCode=1;}).finally(async()=>{fs.mkdirSync('artifacts/qa',{recursive:true});fs.writeFileSync('artifacts/qa/browser.json',JSON.stringify(report,null,2));if(browser)await browser.close();if(server)await new Promise(r=>server.close(r));});

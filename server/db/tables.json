@@ -15,5 +15,8 @@
   "listing_requests",
   "import_batches",
   "import_rows",
-  "audit_logs"
+  "audit_logs",
+  "email_outbox",
+  "request_limits",
+  "analytics_daily"
 ]

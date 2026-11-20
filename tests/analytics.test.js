@@ -1,0 +1,22 @@
+const assert=require('node:assert/strict'),crypto=require('node:crypto');
+process.env.NODE_ENV='test';process.env.RINKCIRCUIT_TEST_SCHEMA='rinkcircuit_test_'+crypto.randomBytes(8).toString('hex');process.env.ADMIN_USER='admin';process.env.ADMIN_TOKEN=crypto.randomBytes(32).toString('hex');process.env.ANALYTICS_ENABLED='true';
+const {getDb,closeDb}=require('../server/db/database');const {migrate}=require('../server/db/migrate');const {record}=require('../server/services/analytics');const db=getDb();let server;
+async function run(){await migrate();const now=new Date().toISOString();
+for(const [id,status] of [['a','verified'],['b','verified'],['c','unverified']])await db.run('INSERT INTO rinkcircuit.leads(id,name,email,verification_status,created_at,updated_at) VALUES (?,?,?,?,?,?)',id,id,id+'@example.test',status,now,now);
+for(const [id,lead,status] of [['one','a','pending'],['two','a','pending'],['three','b','rejected'],['four','c','pending']])await db.run(`INSERT INTO rinkcircuit.interests(id,lead_id,interest_type,city,preferred_nights,moderation_status,created_at) VALUES (?,?,'league_request','Toronto','Monday, Tuesday',?,?)`,id,lead,status,now);
+await Promise.all(Array.from({length:6},()=>record('interest_submitted')));
+server=require('../server/index').listen(0,'127.0.0.1');await new Promise(r=>server.once('listening',r));const base='http://127.0.0.1:'+server.address().port;
+const post=body=>fetch(base+'/api/analytics',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+assert.equal((await post({event:'official_link_clicked',consent:false})).status,400);
+assert.equal((await post({event:'email_verified',consent:true})).status,400);
+assert.equal((await post({event:'official_link_clicked',consent:true,email:'private@example.test'})).status,400);
+assert.equal((await post({event:'official_link_clicked',consent:true})).status,204);
+process.env.ANALYTICS_ENABLED='false';assert.equal((await post({event:'official_link_clicked',consent:true})).status,204);
+assert.equal((await db.get("SELECT count FROM rinkcircuit.analytics_daily WHERE event_name='official_link_clicked'")).count,1);
+const login=await fetch(base+'/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:'admin',password:process.env.ADMIN_TOKEN})});assert.equal(login.status,200);
+const overview=await (await fetch(base+'/api/admin/overview',{headers:{cookie:login.headers.get('set-cookie').split(';')[0]}})).json();
+assert.equal(overview.counts.rawSubmissions,6);assert.equal(overview.counts.verifiedLeads,1);assert.equal(overview.counts.tentativeLeads,1);assert.equal(overview.counts.excludedVerifiedLeads,1);assert.equal(overview.demandByCity[0].count,1);assert.ok(overview.demandByNight.every(row=>row.count===1));
+assert.ok(!JSON.stringify(overview).includes('@example.test'));
+console.log('Analytics passed: atomic raw counters, opt-in and disable switch, private-field rejection, verified unique demand, rejected-interest exclusion and night deduplication.');
+}
+run().catch(e=>{console.error(e.message);process.exitCode=1;}).finally(async()=>{if(server)await new Promise(r=>server.close(r));try{await db.exec('DROP SCHEMA IF EXISTS rinkcircuit CASCADE');}finally{await closeDb();}});

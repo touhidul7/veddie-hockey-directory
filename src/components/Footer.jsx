@@ -14,7 +14,7 @@ export default function Footer({ navigate }) {
             <p className="text-xs text-slate-400 leading-relaxed">
               Greater Toronto's independent discovery directory for adult ice hockey leagues, recreational teams, and tournament competitions.
             </p>
-            <div className="pt-2 text-xs text-slate-500">
+            <div className="pt-2 text-xs text-slate-400">
               Launch region: Greater Toronto Area (ON)
             </div>
           </div>
@@ -104,7 +104,7 @@ export default function Footer({ navigate }) {
               </li>
               <li>
                 <button onClick={() => navigate('/privacy')} className="hover:text-white transition-colors">
-                  Privacy Policy (CASL Compliance)
+                  Privacy Notice
                 </button>
               </li>
               <li>
@@ -122,13 +122,13 @@ export default function Footer({ navigate }) {
         </div>
 
         {/* Ownership Disclosure & Acceptance Note */}
-        <div className="pt-8 border-t border-slate-800 text-xs text-slate-500 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="pt-8 border-t border-slate-800 text-xs text-slate-400 flex flex-col md:flex-row justify-between items-center gap-4">
           <p>
             © 2026 Plaionn Sports Group. All rights reserved. Plaionn-operated competitions are transparently identified.
             Independent third-party leagues maintain their own registrations and governance.
           </p>
           <div className="flex items-center space-x-4 text-xs text-slate-400">
-            <span>Verified GTA Directory v1.0</span>
+            <span>GTA Hockey Directory v1.0</span>
             <span>•</span>
             <button onClick={() => navigate('/admin')} className="text-blue-400 hover:underline">
               Admin Login

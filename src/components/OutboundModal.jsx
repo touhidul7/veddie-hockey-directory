@@ -1,14 +1,18 @@
+import {track} from '../lib/analytics';
+import {safeUrl} from '../lib/safeUrl';
+import useDialog from './useDialog';
 import React from 'react';
 import { ExternalLink, ShieldAlert, X } from 'lucide-react';
 
-export default function OutboundModal({ isOpen, onClose, targetUrl, targetName }) {
+export default function OutboundModal({ isOpen, onClose, targetUrl, targetName, eventType='official_link_clicked' }) {
+  const dialogRef=useDialog(isOpen,onClose);
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs">
+    <div ref={dialogRef} role="dialog" aria-modal="true" aria-label="External website notice" tabIndex={-1} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs">
       <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in-95 duration-150">
         <button
-          onClick={onClose}
+          aria-label="Close dialog" onClick={onClose}
           className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100"
         >
           <X className="w-5 h-5" />
@@ -43,16 +47,16 @@ export default function OutboundModal({ isOpen, onClose, targetUrl, targetName }
 
         <div className="flex items-center justify-end space-x-3">
           <button
-            onClick={onClose}
+            onClick={event=>{if(!safeUrl(targetUrl))event.preventDefault();else {track(eventType==='external_registration_clicked'?eventType:'official_link_clicked');onClose();}}}
             className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors"
           >
             Cancel
           </button>
           <a
-            href={targetUrl}
+            href={safeUrl(targetUrl)||undefined} aria-disabled={!safeUrl(targetUrl)}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={onClose}
+            onClick={event=>{if(!safeUrl(targetUrl))event.preventDefault();else {track(eventType==='external_registration_clicked'?eventType:'official_link_clicked');onClose();}}}
             className="px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow transition-colors flex items-center gap-1.5"
           >
             <span>Proceed to Official Website</span>

@@ -1,4 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import {track} from '../lib/analytics';
+import {setMetadata} from '../lib/metadata';
+import useDialog from '../components/useDialog';
+import React, { useState, useEffect, useRef } from 'react';
 import { Search, Filter, RotateCcw, AlertCircle, HelpCircle, ArrowRight } from 'lucide-react';
 import LeagueCard from '../components/LeagueCard';
 import FilterSidebar from '../components/FilterSidebar';
@@ -7,67 +10,114 @@ export default function LeagueFinderPage({ navigate, onExternalClick, initialQue
   const [leagues, setLeagues] = useState([]);
   const [totalMatches, setTotalMatches] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [error,setError]=useState(null);
+  const [retry,setRetry]=useState(0);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
+  const filterDialog=useDialog(mobileFilterOpen,()=>setMobileFilterOpen(false));
+
+  const lastMetrics=useRef(null);
   // Initialize filters from URL search params
-  const [filters, setFilters] = useState(() => {
+  function readFilters() {
     const params = new URLSearchParams(window.location.search);
+    const q = params.get('q') || '';
     return {
-      q: params.get('q') || '',
+      offset: Math.max(0,Number(params.get('offset'))||0),
+      season: params.get('season') || '',
+      q,
       city: params.get('city') || '',
       category: params.get('category') || '',
+      age: params.get('age') || '',
       night: params.get('night') || '',
       level: params.get('level') || '',
       reg: params.get('reg') || '',
-      sport: params.get('sport') || '',
-      sort: params.get('sort') || 'relevance'
+      sport: params.has('sport') ? params.get('sport') : 'ice_hockey',
+      sort: params.get('sort') || (q ? 'relevance' : 'name')
     };
-  });
+  }
+  const [filters,setFilterState]=useState(readFilters);
+  function setFilters(next){
+    let sort=next.sort||filters.sort;
+    if(next.q&&!filters.q&&filters.sort==='name'&&next.sort===filters.sort)sort='relevance';
+    if(!next.q&&filters.q&&filters.sort==='relevance'&&next.sort===filters.sort)sort='name';
+    setFilterState({...next,sort,offset:0});
+  }
+  useEffect(()=>{const sync=()=>setFilterState(readFilters());window.addEventListener('popstate',sync);window.addEventListener('rinkcircuit:navigate',sync);return()=>{window.removeEventListener('popstate',sync);window.removeEventListener('rinkcircuit:navigate',sync);};},[]);
 
   // Sync state to URL and fetch leagues
   useEffect(() => {
+    const controller=new AbortController();
     const params = new URLSearchParams();
+    if(filters.season)params.set('season',filters.season);
+    if(filters.offset)params.set('offset',String(filters.offset));
     if (filters.q) params.set('q', filters.q);
     if (filters.city) params.set('city', filters.city);
     if (filters.category) params.set('category', filters.category);
+    if (filters.age) params.set('age', filters.age);
     if (filters.night) params.set('night', filters.night);
     if (filters.level) params.set('level', filters.level);
     if (filters.reg) params.set('reg', filters.reg);
     if (filters.sport) params.set('sport', filters.sport);
-    if (filters.sort && filters.sort !== 'relevance') params.set('sort', filters.sort);
+    if (filters.sort && filters.sort !== (filters.q ? 'relevance' : 'name')) params.set('sort', filters.sort);
 
     const queryString = params.toString();
     const newRelativePathQuery = window.location.pathname + (queryString ? `?${queryString}` : '');
     window.history.replaceState(null, '', newRelativePathQuery);
+    setMetadata('Adult Hockey League Finder | RinkCircuit',true);
 
     async function fetchLeagues() {
-      setLoading(true);
+      setLoading(true);setError(null);
       try {
-        const res = await fetch(`/api/leagues?${queryString}`);
+        const res = await fetch(`/api/leagues?${queryString}`,{signal:controller.signal});
+        if(!res.ok)throw new Error('Unable to load leagues. Please retry.');
         const data = await res.json();
+        if(controller.signal.aborted)return;
+        const metricFilters=JSON.stringify({...filters,q:undefined,offset:undefined});
+        if(filters.q&&lastMetrics.current?.q!==filters.q)track('search_submitted');
+        if(lastMetrics.current&&lastMetrics.current.filters!==metricFilters)track('filter_applied');
+        lastMetrics.current={q:filters.q,filters:metricFilters};
         setLeagues(data.data || []);
         setTotalMatches(data.pagination?.total || 0);
       } catch (err) {
-        console.error('Error fetching leagues:', err);
+        if(!controller.signal.aborted){setError(err.message);setLeagues([]);}
       } finally {
-        setLoading(false);
+        if(!controller.signal.aborted)setLoading(false);
       }
     }
 
-    fetchLeagues();
-  }, [filters]);
+    const timer=setTimeout(fetchLeagues,200);
+    return()=>{clearTimeout(timer);controller.abort();};
+  }, [filters,retry]);
 
   function handleResetFilters() {
     setFilters({
-      q: '',
+      season:'',offset:0,q: '',
       city: '',
       category: '',
+      age: '',
       night: '',
       level: '',
       reg: '',
-      sport: '',
-      sort: 'relevance'
+      sport: 'ice_hockey',
+      sort: 'name'
     });
+  }
+
+  const sponsoredLeagues = leagues.filter(league => Number(league.is_sponsored) === 1);
+  const organicLeagues = leagues.filter(league => Number(league.is_sponsored) !== 1);
+  function renderLeagueCards(items) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {items.map(league => (
+          <LeagueCard
+            key={league.id}
+            league={league}
+            onSelect={slug => navigate(`/leagues/${slug}`)}
+            onExternalClick={onExternalClick}
+          />
+        ))}
+      </div>
+    );
   }
 
   return (
@@ -78,16 +128,17 @@ export default function LeagueFinderPage({ navigate, onExternalClick, initialQue
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             Adult Hockey League Finder
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Search verified adult recreational, commercial, and oldtimers leagues across the Greater Toronto Area.
+          <p className="text-xs sm:text-sm text-slate-600 mt-1">
+            Search published adult recreational, commercial, and oldtimers leagues across the Greater Toronto Area.
           </p>
         </div>
 
         {/* Top Search & Sort Controls */}
         <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
           <div className="flex-1 flex items-center px-3 bg-slate-50 rounded-lg border border-slate-200 focus-within:border-blue-500 focus-within:bg-white transition-colors">
-            <Search className="w-4 h-4 text-slate-400 shrink-0" />
+            <Search className="w-4 h-4 text-slate-600 shrink-0" />
             <input
+              aria-label="Search leagues"
               type="text"
               value={filters.q}
               onChange={(e) => setFilters({ ...filters, q: e.target.value })}
@@ -96,8 +147,8 @@ export default function LeagueFinderPage({ navigate, onExternalClick, initialQue
             />
             {filters.q && (
               <button
-                onClick={() => setFilters({ ...filters, q: '' })}
-                className="text-xs text-slate-400 hover:text-slate-600 p-1"
+                aria-label="Clear search" onClick={() => setFilters({ ...filters, q: '' })}
+                className="text-xs text-slate-600 hover:text-slate-600 p-1"
               >
                 ✕
               </button>
@@ -106,7 +157,7 @@ export default function LeagueFinderPage({ navigate, onExternalClick, initialQue
 
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setMobileFilterOpen(!mobileFilterOpen)}
+              aria-expanded={mobileFilterOpen} onClick={() => setMobileFilterOpen(!mobileFilterOpen)}
               className="lg:hidden px-3.5 py-2 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100 flex items-center gap-1.5"
             >
               <Filter className="w-3.5 h-3.5 text-blue-600" />
@@ -114,7 +165,7 @@ export default function LeagueFinderPage({ navigate, onExternalClick, initialQue
             </button>
 
             <select
-              value={filters.sort}
+              aria-label="Sort leagues" value={filters.sort}
               onChange={(e) => setFilters({ ...filters, sort: e.target.value })}
               className="text-xs font-medium px-3 py-2 rounded-lg border border-slate-200 bg-slate-50 text-slate-700 focus:outline-none"
             >
@@ -140,13 +191,13 @@ export default function LeagueFinderPage({ navigate, onExternalClick, initialQue
 
         {/* Mobile Filter Drawer */}
         {mobileFilterOpen && (
-          <div className="lg:hidden fixed inset-0 z-50 bg-slate-900/60 p-4 flex justify-end">
+          <div ref={filterDialog} role="dialog" aria-modal="true" aria-label="Filter leagues" tabIndex={-1} className="lg:hidden fixed inset-0 z-50 bg-slate-900/60 p-4 flex justify-end">
             <div className="bg-white w-full max-w-sm rounded-2xl p-4 shadow-xl overflow-y-auto max-h-[90vh]">
               <div className="flex justify-between items-center pb-3 mb-4 border-b border-slate-100">
                 <span className="font-bold text-sm text-slate-900">Filter Leagues</span>
                 <button
                   onClick={() => setMobileFilterOpen(false)}
-                  className="text-xs text-slate-500 font-bold p-1"
+                  className="text-xs text-slate-600 font-bold p-1"
                 >
                   ✕ Close
                 </button>
@@ -171,7 +222,8 @@ export default function LeagueFinderPage({ navigate, onExternalClick, initialQue
 
         {/* Listings Result Column */}
         <div className="lg:col-span-3 space-y-6">
-          {loading ? (
+          <p role="status" aria-live="polite" className="text-sm">{loading?'Loading results…':error?'Search unavailable':`${totalMatches} matching programmes`}</p>
+          {error ? <div role="alert" className="rounded-xl bg-white border p-6"><p>{error}</p><button className="underline text-blue-700" onClick={()=>setRetry(retry+1)}>Retry search</button></div> : loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-pulse">
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div key={i} className="bg-white rounded-xl h-64 border border-slate-200"></div>
@@ -184,7 +236,7 @@ export default function LeagueFinderPage({ navigate, onExternalClick, initialQue
                 <AlertCircle className="w-6 h-6" />
               </div>
               <h3 className="text-lg font-bold text-slate-900">No leagues matched your active filters</h3>
-              <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+              <p className="text-xs text-slate-600 max-w-md mx-auto leading-relaxed">
                 We did not find any published leagues for the current criteria. We never fabricate missing leagues.
                 You can clear your filters or register unmet local demand for your municipality.
               </p>
@@ -206,17 +258,22 @@ export default function LeagueFinderPage({ navigate, onExternalClick, initialQue
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {leagues.map((league) => (
-                <LeagueCard
-                  key={league.id}
-                  league={league}
-                  onSelect={(slug) => navigate(`/leagues/${slug}`)}
-                  onExternalClick={onExternalClick}
-                />
-              ))}
+            <div className="space-y-6">
+              {sponsoredLeagues.length > 0 && (
+                <section aria-label="Sponsored listings" className="space-y-3">
+                  <h2 className="text-sm font-bold text-slate-700">Sponsored listings</h2>
+                  {renderLeagueCards(sponsoredLeagues)}
+                </section>
+              )}
+              {organicLeagues.length > 0 && (
+                <section aria-label="Directory listings" className="space-y-3">
+                  {sponsoredLeagues.length > 0 && <h2 className="text-sm font-bold text-slate-700">Directory listings</h2>}
+                  {renderLeagueCards(organicLeagues)}
+                </section>
+              )}
             </div>
           )}
+          {!loading&&!error&&totalMatches>50&&<nav aria-label="Result pages" className="flex gap-4 items-center"><button disabled={!filters.offset} onClick={()=>setFilterState({...filters,offset:Math.max(0,(filters.offset||0)-50)})}>Previous</button><span>Page {Math.floor((filters.offset||0)/50)+1} of {Math.ceil(totalMatches/50)}</span><button disabled={(filters.offset||0)+50>=totalMatches} onClick={()=>setFilterState({...filters,offset:(filters.offset||0)+50})}>Next</button></nav>}
         </div>
       </div>
     </div>

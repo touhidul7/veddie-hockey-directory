@@ -1,0 +1,895 @@
+{
+  "reviewedOn": "2026-11-16",
+  "scope": "Public-source triage only. This is not publication approval or confirmation of fees, availability, contacts, or every workbook field. Inaccessible pages do not imply a programme has closed. Corrections below are proposals; original staged records remain unchanged.",
+  "allocationDocumentCaveat": "Document body is headed 2026-2027 despite the URL filename. Applicant allocation does not establish public registration or programme details.",
+  "counts": {
+    "location_only": 8,
+    "source_update": 7,
+    "primary_supported": 27,
+    "entity_split": 8,
+    "unresolved": 6,
+    "seasonal_only": 6,
+    "allocation_only": 17
+  },
+  "rows": [
+    {
+      "rowNumber": 1,
+      "name": "True North Hockey Canada",
+      "fingerprint": "7fea872b5c2ba7731501dcb3626a9e7ed4315188c5bbf194489714691cbc770b",
+      "result": "location_only",
+      "note": "Operator contact page supports identity. Obtain programme sources for Toronto and Brampton separately.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://www.truenorthhockey.com/Home/ContactUs"
+      ]
+    },
+    {
+      "rowNumber": 2,
+      "name": "Sports Village Hockey League",
+      "fingerprint": "396c9c1b915a50b5e47557716babd9fb4081c237f75dbdc26445af856c5538da",
+      "result": "source_update",
+      "note": "Adult league page supports programme identity; replace the directory source.",
+      "recommendedSource": "https://www.sportsvillage.ca/adult-hockey-league-3/",
+      "suppliedSources": [
+        "https://www.sportsvillage.ca/directory/"
+      ]
+    },
+    {
+      "rowNumber": 3,
+      "name": "Oak Ridges Men's Recreational Hockey League",
+      "fingerprint": "08039a4d025b2f8a2502cde3b795d16a767c000298f511d103156aed5e51577f",
+      "result": "primary_supported",
+      "note": "Official site shows the league and 2026/27 season.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://ormrhl.com/"
+      ]
+    },
+    {
+      "rowNumber": 4,
+      "name": "York Oldtimers Hockey League",
+      "fingerprint": "dab44b7981c20c54fe20b08f952754a0759ca12008e046f565a8694b4c465334",
+      "result": "entity_split",
+      "note": "Official league spans Newmarket, Aurora and Richmond Hill. Reconcile municipality and division records.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://yorkoldtimershockeyleague.com/"
+      ]
+    },
+    {
+      "rowNumber": 5,
+      "name": "Halton Men's Hockey League / Oakville Summer",
+      "fingerprint": "e5622ef33e625d368d285a3fb883b35042cc782517cc352f0996b6e5ceb59956",
+      "result": "entity_split",
+      "note": "Source describes separate winter and summer leagues. Separate season and venue scope.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://hmhlhockey.com/about/"
+      ]
+    },
+    {
+      "rowNumber": 6,
+      "name": "Whitby Men's Hockey League",
+      "fingerprint": "30a40e9f2c52bc93966fd35352ef8bfb10e127a924133585559373be5055b2ad",
+      "result": "primary_supported",
+      "note": "Official site shows 2026/27 and separate 35+ and 50+ divisions.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://www.whitbymhl.ca/"
+      ]
+    },
+    {
+      "rowNumber": 7,
+      "name": "Markham Men's Recreational Hockey League",
+      "fingerprint": "23320039932a1f71778be74a8c04d64fabd1d916b202fce3c800d6054c671cb0",
+      "result": "primary_supported",
+      "note": "Official site identifies an adult member-run Markham league.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://mmrhl.ca/"
+      ]
+    },
+    {
+      "rowNumber": 8,
+      "name": "LOHL (Lakeshore Oldtimers)",
+      "fingerprint": "49d15cdf204c9e9392182d6d4631f26d7832c3392cf66543348c0427787e3468",
+      "result": "primary_supported",
+      "note": "Official about page supports 40+ league identity. Confirm current arena naming.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://lohl.ca/about"
+      ]
+    },
+    {
+      "rowNumber": 9,
+      "name": "ASHL – York",
+      "fingerprint": "a16820030ab9684021826987a3a94e6882e207cecf0428528411b69390326886",
+      "result": "location_only",
+      "note": "ASHL contact page supports this location; obtain its season-specific programme source.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://www.ashl.ca/contact/"
+      ]
+    },
+    {
+      "rowNumber": 10,
+      "name": "ASHL – Scarborough",
+      "fingerprint": "01716d8acdc47e87f7c029b4344fd6b4f7abb941959ac2acb0be4cc5963e9512",
+      "result": "location_only",
+      "note": "ASHL contact page supports this location; obtain its season-specific programme source.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://www.ashl.ca/contact/"
+      ]
+    },
+    {
+      "rowNumber": 11,
+      "name": "ASHL – Oshawa",
+      "fingerprint": "025aaee5a93fe8d504167af9780f96bd9fa18d6ec3adeddf72db33993a12e141",
+      "result": "location_only",
+      "note": "ASHL contact page supports this location; obtain its season-specific programme source.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://www.ashl.ca/contact/"
+      ]
+    },
+    {
+      "rowNumber": 12,
+      "name": "ASHL – Oakville",
+      "fingerprint": "947c12679ae4815dc7a8bcb41df93af7d8a788aefd8608925212d06f140b6096",
+      "result": "location_only",
+      "note": "ASHL contact page supports this location; obtain its season-specific programme source.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://www.ashl.ca/contact/"
+      ]
+    },
+    {
+      "rowNumber": 13,
+      "name": "ASHL – Mississauga",
+      "fingerprint": "9567efdd95015e64aa5a3914f55638a17cf35ddf389a04759f747c2427494790",
+      "result": "location_only",
+      "note": "ASHL contact page supports this location; obtain its season-specific programme source.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://www.ashl.ca/contact/"
+      ]
+    },
+    {
+      "rowNumber": 14,
+      "name": "Iroquois Park Adult Hockey League",
+      "fingerprint": "fcc86d2efca767aa4180cf293a6f19b1198d65d9ecb0ad4d78b65fefebefe975",
+      "result": "primary_supported",
+      "note": "Municipal page identifies adult hockey at Iroquois Park and 2026/27 information.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://www.whitby.ca/explore-and-enjoy/parks-and-recreation/whitby-sports-leagues/"
+      ]
+    },
+    {
+      "rowNumber": 15,
+      "name": "WAVE Hockey Adult",
+      "fingerprint": "fe61728043c303eade969691660b85ffcc8d27894742b2da31d0e173564dac8b",
+      "result": "source_update",
+      "note": "Old WAVE source redirects to Conacher. Dedicated WAHL page supports Burlington programme identity.",
+      "recommendedSource": "https://waveadulthockeyleague.ca/wahl/",
+      "suppliedSources": [
+        "https://wavesports.ca/contact/"
+      ]
+    },
+    {
+      "rowNumber": 16,
+      "name": "Mississauga Adult Hockey League (CMAHL)",
+      "fingerprint": "04396a476ab4b6ef6a34dfe2bf31f3054933305af20306a2ee16714cdc8ae7bb",
+      "result": "unresolved",
+      "note": "Municipal homepage is insufficient. Search found historical CMAHL documents, not a current programme source.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://www.mississauga.ca/"
+      ]
+    },
+    {
+      "rowNumber": 17,
+      "name": "Greater Toronto Ball Hockey League",
+      "fingerprint": "e1f8410545d1bab962a7055938392b496ff219a5ac2f0fcd19cc5e85194cb7de",
+      "result": "primary_supported",
+      "note": "Official contact page supports adult ball hockey identity across multiple GTA markets. Current season not established.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://www.greatertorontoballhockeyleague.com/text/11-contact"
+      ]
+    },
+    {
+      "rowNumber": 18,
+      "name": "York Central Ball Hockey League",
+      "fingerprint": "e99b437ec5afa48d72630c92c3b5ef57de822bc2eb0f409bc51269531a761ac6",
+      "result": "primary_supported",
+      "note": "Official page supports adult ball hockey identity in Toronto, Scarborough and Markham.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://www.yorkcentralbhl.com/text/11-contact"
+      ]
+    },
+    {
+      "rowNumber": 19,
+      "name": "Burlington Adult Ball Hockey League",
+      "fingerprint": "10d9e87cdecabe664554e2a044b7bd20562914f1c36c9ee05d18a481c9741932",
+      "result": "source_update",
+      "note": "Old site announces an ownership move. Replacement site identifies Burlington Ball Hockey League; reconcile operator before use.",
+      "recommendedSource": "https://www.ballhockeyburlington.com/burlingtonballhockeyleague21/",
+      "suppliedSources": [
+        "https://leagues.teamlinkt.com/burlingtonballhockeyleague/ContactUs"
+      ]
+    },
+    {
+      "rowNumber": 20,
+      "name": "ASHL – Etobicoke",
+      "fingerprint": "eac674862d0208aed0887f17516857be4a78426b2c0523648f5adea67114172f",
+      "result": "source_update",
+      "note": "Etobicoke winter page supports 2026/27. Remove unrelated Scarborough summer source.",
+      "recommendedSource": "https://www.ashl.ca/etobicoke-winter-season/",
+      "suppliedSources": [
+        "https://www.ashl.ca/scarborough-summer-season/?utm_source=chatgpt.com",
+        "https://www.ashl.ca/etobicoke-winter-season/?utm_source=chatgpt.com"
+      ]
+    },
+    {
+      "rowNumber": 21,
+      "name": "DMHL",
+      "fingerprint": "387173ce6e4dfd8b36bc1eab43d987a0bc0187da5d0536246b2190a3bc2a34ca",
+      "result": "location_only",
+      "note": "Arena portfolio supports Toronto venues. Remove citation marker from area and obtain programme detail.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://www.dmhl.ca/arenas"
+      ]
+    },
+    {
+      "rowNumber": 22,
+      "name": "LUG Sports OA Men’s Hockey",
+      "fingerprint": "95e8d1fd8ae2d6b46cfcaacd3f02378e32d2ce7a78e5ad41a3de9850156d2439",
+      "result": "entity_split",
+      "note": "Adult 21+ offering spans multiple cities. Split local programmes rather than treating the full market list as a municipality.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://www.lugsports.com/toronto?utm_source=chatgpt.com",
+        "https://www.lugsports.com/adult-hockey-league-lug-oa?utm_source=chatgpt.com",
+        "https://www.lugsports.com/refund-policy?utm_source=chatgpt.com"
+      ]
+    },
+    {
+      "rowNumber": 23,
+      "name": "Moss Park Men’s Adult League",
+      "fingerprint": "eeea213fb2ef3ba739d4b9c443feb16a40691776b66afcec743016bbfcd60263",
+      "result": "unresolved",
+      "note": "Programme page timed out during review. Obtain readable official evidence before approval.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://mossparkarena.com/home/about-us/contact/?utm_source=chatgpt.com",
+        "https://mossparkarena.com/home/hockey/adult-hockey/mens-adult-hockey-league/?utm_source=chatgpt.com"
+      ]
+    },
+    {
+      "rowNumber": 24,
+      "name": "Bill Bolton Arena Summer Men’s League",
+      "fingerprint": "745f6d64c54a9c69c5ddd2e9f5e09979d1ec57d3df4435a494b3e9e41f1c65bd",
+      "result": "seasonal_only",
+      "note": "Official page describes summer adult hockey; it does not establish winter availability.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://www.billboltonarena.ca/summeradulthockey?utm_source=chatgpt.com"
+      ]
+    },
+    {
+      "rowNumber": 25,
+      "name": "Westwood Arena Adult League",
+      "fingerprint": "ff78638befdf4b5f794e9e9ac0b09bacaca8b3096dadc7d081a0b84e636e1f10",
+      "result": "unresolved",
+      "note": "Redirected arena page provided no readable programme evidence. Manual source review needed.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://www.westwoodarena.com/?utm_source=chatgpt.com"
+      ]
+    },
+    {
+      "rowNumber": 26,
+      "name": "Chesswood Arena Adult Hockey",
+      "fingerprint": "ca2c7bcf17ff91a8d9206cdd2837dfb2c964fed0c88fd5dff0f232d6c103f772",
+      "result": "entity_split",
+      "note": "Official adult league page names Chesswood and Scotiabank Pond. Resolve shared programme identity with row 65.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://www.chesswoodarena.com/leagues/custom_page.cfm?clientID=6582&leagueID=30279&pageID=19058&utm_source=chatgpt.com"
+      ]
+    },
+    {
+      "rowNumber": 27,
+      "name": "Unionville Men’s Hockey Club",
+      "fingerprint": "dad304ed585bcbac3865748fe8defc60aceb751a5306a89dff6b4b37384476ce",
+      "result": "primary_supported",
+      "note": "Official about page supports 35+ Unionville/Markham club identity.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://www.umhc.ca/content/about-umhc?utm_source=chatgpt.com"
+      ]
+    },
+    {
+      "rowNumber": 28,
+      "name": "Canadian Beer League",
+      "fingerprint": "ab8647a0c6ec6585fe8f8af36f47d7b86cc54ccf8e8c44aa9441d6544208c462",
+      "result": "entity_split",
+      "note": "Location page includes league, practice and shinny offerings. Establish which programme this record represents.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://canadianbeerleague.com/mississauga",
+        "https://canadianbeerleague.com/cbl"
+      ]
+    },
+    {
+      "rowNumber": 29,
+      "name": "Brampton Oldtimers Hockey League",
+      "fingerprint": "e7c03f07599c9a0e53d71445ac86a4b5c4ec7cdfd40bac3c0f32dcdbce08bf00",
+      "result": "primary_supported",
+      "note": "Official venue page identifies Brampton Oldtimers league at CAA Centre.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://caacentre.com/brampton-oldtimers-hockey-league/?utm_source=chatgpt.com"
+      ]
+    },
+    {
+      "rowNumber": 30,
+      "name": "North Brampton Men’s Hockey League",
+      "fingerprint": "baf7c7171725509bc1868d802e19058842f757e9314c02b0bf888094fbc1c4d5",
+      "result": "primary_supported",
+      "note": "League site supports identity and 2025/26 results. Current venue and eligibility need confirmation.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://www.hometeamsonline.com/NORTHBRAMPTONMENSHOC?utm_source=chatgpt.com"
+      ]
+    },
+    {
+      "rowNumber": 31,
+      "name": "Teen Ranch Men’s League",
+      "fingerprint": "1b4e325005adc5b8da802365fb63a527ec1ec55fb349ac298fea0e28b42a4fe6",
+      "result": "primary_supported",
+      "note": "Indexed official page describes adult 18+ and 35+ programmes for 2026/27; direct extraction was empty.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://teenranch.com/programs/hockey-and-skating/mens-hockey-league/?utm_source=chatgpt.com"
+      ]
+    },
+    {
+      "rowNumber": 32,
+      "name": "York Adult Hockey League",
+      "fingerprint": "7b1e50bf77db3e6b29aa56543653dfed6eb9889b7151d9cefb71b8d6fa31f65e",
+      "result": "seasonal_only",
+      "note": "Official page describes summer adult league at Clippers Complex. Winter offering not established.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://www.townofws.ca/play/recreation/programs/adult-programming/york-adult-hockey-league/"
+      ]
+    },
+    {
+      "rowNumber": 33,
+      "name": "NTR Newmarket Adult League",
+      "fingerprint": "50ca391d1fc4117118eed831699a480549b1d93eb99ddb1128fee11bfe138b74",
+      "result": "primary_supported",
+      "note": "Official NTR page supports 2026/27 adult league identity.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://ntrcanada.com/newmarket/3on3-programs/adults/adultleagues/?utm_source=chatgpt.com",
+        "https://ntrcanada.com/newmarket/3on3-programs/adults/adultleagues/?utm_source=chatgpt.com"
+      ]
+    },
+    {
+      "rowNumber": 34,
+      "name": "New Direction Men’s Hockey League",
+      "fingerprint": "bf085e0a0dd0b808eec28b7ba7dc78b660b94feec8b3c593526b6be28c90d4f1",
+      "result": "seasonal_only",
+      "note": "Official site describes summer 2026 and a 2027 announcement. Verify season and venue before publishing.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://www.newdirectionhockey.com/?utm_source=chatgpt.com"
+      ]
+    },
+    {
+      "rowNumber": 35,
+      "name": "Newmarket Men’s Hockey League",
+      "fingerprint": "7fac22f5b27ecc5e02df5eddc2fec546ecf399c4d7626f522730cc1ea8ad17ae",
+      "result": "primary_supported",
+      "note": "Official league site displays games supporting programme identity.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://www.newmarketmenshockey.com/?utm_source=chatgpt.com"
+      ]
+    },
+    {
+      "rowNumber": 36,
+      "name": "Newmarket Old Timers Hockey League",
+      "fingerprint": "3d5b371ec733c0f070fcd6bf615c1670e32a50657ebe7df3fcb61c86ea5aa107",
+      "result": "primary_supported",
+      "note": "Official league site displays 2026/27 statistics.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://newmarketoldtimershockeyleague.com/?utm_source=chatgpt.com"
+      ]
+    },
+    {
+      "rowNumber": 37,
+      "name": "Oshawa Adult Recreational Hockey League",
+      "fingerprint": "805245df89fa6b2b352f2f3e6bfd63c7ea87f7c64da09e92b73125abc8104a7f",
+      "result": "primary_supported",
+      "note": "Municipal page supports 2026/27 adult hockey at Delpark.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://www.oshawa.ca/explore-play/recreation/hockey-and-skating/adult-hockey-league/"
+      ]
+    },
+    {
+      "rowNumber": 38,
+      "name": "DCAHL",
+      "fingerprint": "981690405776f8596c065d38d75dd57708dfd2a23d4bba2b2fdd578c77c07a1a",
+      "result": "primary_supported",
+      "note": "Official venue page supports DCAHL and 2026/27 winter information.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://www.tributecommunitiescentre.com/ice-rec-hockey/dcahl?utm_source=chatgpt.com"
+      ]
+    },
+    {
+      "rowNumber": 39,
+      "name": "Ajax Oldtimers Hockey",
+      "fingerprint": "675bb292b346f84347f5f84c4730e0d6d00727746b0a8210b503f033a7a4efe3",
+      "result": "primary_supported",
+      "note": "Official site supports 35+ Ajax resident league and 2026/27. Do not infer open registration.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://aohl.org/?utm_source=chatgpt.com"
+      ]
+    },
+    {
+      "rowNumber": 40,
+      "name": "Burlington Men’s Hockey League",
+      "fingerprint": "c16a5cc4ce8bf802eb2013bc57f2cf37f4dd9d1d9fdc27c5ac67db2ed9416685",
+      "result": "primary_supported",
+      "note": "Official site supports adult league identity and a 2026/27 waitlist. Do not label registration open.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://www.thebmhl.ca/"
+      ]
+    },
+    {
+      "rowNumber": 41,
+      "name": "Francis Hockey – Milton",
+      "fingerprint": "536e877d6a89dd21194b453b6c2dec534786ecad7af597f3904a01fb3234345c",
+      "result": "primary_supported",
+      "note": "Official site supports 2026/27 Milton hockey and multiple venues.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://www.francishockey.com/?utm_source=chatgpt.com"
+      ]
+    },
+    {
+      "rowNumber": 42,
+      "name": "Milton Adult Hockey League",
+      "fingerprint": "c9cf9f39a0ca456a14436b47a1624b8ab3e0813baddaddddbd69564069f68a7a",
+      "result": "unresolved",
+      "note": "Schedule provider returned a bot challenge. No current programme evidence verified.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://esportsdesk.com/leagues/schedules.cfm?clientID=1944&leagueID=7008&utm_source=chatgpt.com"
+      ]
+    },
+    {
+      "rowNumber": 43,
+      "name": "Port Credit Oldtimers Hockey League",
+      "fingerprint": "f1f09c9e430afd7db2a04ca62cfea0c0d8a956faf4a2e8dea987a20650834cd7",
+      "result": "source_update",
+      "note": "Official site found for previously missing source; it displays 2026/27 league information.",
+      "recommendedSource": "https://www.pcohl.com/",
+      "suppliedSources": []
+    },
+    {
+      "rowNumber": 44,
+      "name": "Loose Ends Hockey Association",
+      "fingerprint": "0d2958e82efa870ddea787ce196ca07c193e640128ec1fbd5edca7676db66da6",
+      "result": "primary_supported",
+      "note": "Official association site displays a current schedule at Ted Reeve.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://looseendshockey.ca/"
+      ]
+    },
+    {
+      "rowNumber": 45,
+      "name": "Malvern Oldtimers Hockey League",
+      "fingerprint": "0a91e718c632b44a8c969fe59d7671fcedab8e31e6d72744401212d8d76127d1",
+      "result": "primary_supported",
+      "note": "League-hosted page displays 2026/27 information and Malvern venue.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://leagues.carhahockey.ca/mohl/"
+      ]
+    },
+    {
+      "rowNumber": 46,
+      "name": "Burlington Oldtimers Hockey Club",
+      "fingerprint": "325dff4686ce91d087d0db868710e52e1526899b3135d2ebf663d83a762f14b2",
+      "result": "primary_supported",
+      "note": "Official club site identifies adult 35+ Burlington hockey.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://www.bohc.ca/"
+      ]
+    },
+    {
+      "rowNumber": 47,
+      "name": "Players Ball Hockey League",
+      "fingerprint": "f6f2ab79228e5fcfb292ee44b3f744a73e2e619a31eb23ae26301fa5d6902bb6",
+      "result": "seasonal_only",
+      "note": "Registration page supports spring 2026 adult ball hockey. Acton location and later season not established.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://www.playersballhockey.ca/playersballhockeyleague/REGISTRATIONINFORMATION"
+      ]
+    },
+    {
+      "rowNumber": 48,
+      "name": "Balmy Beach Club Men’s Hockey",
+      "fingerprint": "fb4ccafa30302579b5705fa100e4cc68fd29b556595d4ce0b611f0b5b2a87eb8",
+      "result": "allocation_only",
+      "note": "Allocation record only; public programme unverified.",
+      "recommendedSource": "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf",
+      "suppliedSources": [
+        "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf"
+      ]
+    },
+    {
+      "rowNumber": 49,
+      "name": "Canadian Japanese Hockey League",
+      "fingerprint": "d8f0ae25c74711fa09b798cabe8fa2457ed319ba1a1296b7c31131e1eb692c5e",
+      "result": "allocation_only",
+      "note": "Allocation record only; public programme unverified.",
+      "recommendedSource": "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf",
+      "suppliedSources": [
+        "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf"
+      ]
+    },
+    {
+      "rowNumber": 50,
+      "name": "Cedarvale Olde Timers Hockey League",
+      "fingerprint": "5476d0a3c84bc6c3b38cdfeff64514790fb2b0bd2f8f7c81480e5acf47a357e0",
+      "result": "allocation_only",
+      "note": "Allocation record only; public programme unverified.",
+      "recommendedSource": "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf",
+      "suppliedSources": [
+        "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf"
+      ]
+    },
+    {
+      "rowNumber": 51,
+      "name": "Etobicoke Oldtimers Hockey Association",
+      "fingerprint": "7e6c222a4461fcc851d1261abe9c1cba133189f9aaa81110ad824d5a28a3330f",
+      "result": "allocation_only",
+      "note": "Allocation record only; public programme unverified.",
+      "recommendedSource": "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf",
+      "suppliedSources": [
+        "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf"
+      ]
+    },
+    {
+      "rowNumber": 52,
+      "name": "Forest Hill Senior Hockey Association",
+      "fingerprint": "78ce8392f8255720774fe3cae8beb60d98c4d88221109b98c0302b0febd3d9ad",
+      "result": "allocation_only",
+      "note": "Allocation record only; public programme unverified.",
+      "recommendedSource": "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf",
+      "suppliedSources": [
+        "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf"
+      ]
+    },
+    {
+      "rowNumber": 53,
+      "name": "GB Sunday Night Hockey League",
+      "fingerprint": "be0217a1d4c6316745440263b38f8d7573bdb12ef35bbe0bfbff7089783c8623",
+      "result": "allocation_only",
+      "note": "Allocation record only; public programme unverified.",
+      "recommendedSource": "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf",
+      "suppliedSources": [
+        "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf"
+      ]
+    },
+    {
+      "rowNumber": 54,
+      "name": "Greater Toronto Oldtimers Hockey League",
+      "fingerprint": "528ea62428627e4527559651130629cf1f8f0bb104f995d98b4cf73620cc2186",
+      "result": "allocation_only",
+      "note": "Allocation record only; public programme unverified.",
+      "recommendedSource": "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf",
+      "suppliedSources": [
+        "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf"
+      ]
+    },
+    {
+      "rowNumber": 55,
+      "name": "Hillcrest Oldtimers Hockey League",
+      "fingerprint": "c7af5eb87e4e7968d390175d2dfc9444609d383bcb59777c785273cb552ac0f6",
+      "result": "allocation_only",
+      "note": "Allocation record only; public programme unverified.",
+      "recommendedSource": "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf",
+      "suppliedSources": [
+        "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf"
+      ]
+    },
+    {
+      "rowNumber": 56,
+      "name": "Humber Valley Oldtimers",
+      "fingerprint": "a605626e3f68fe3500ea2da9ee1b6ceb145013fb6b3f110b4685dccef2ef6f30",
+      "result": "allocation_only",
+      "note": "Allocation record only; public programme unverified.",
+      "recommendedSource": "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf",
+      "suppliedSources": [
+        "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf"
+      ]
+    },
+    {
+      "rowNumber": 57,
+      "name": "North Scarborough Men’s Hockey League",
+      "fingerprint": "c28a8c74a4a33d8986cf5c530132a3df685940ac673f47349e7d9aaa5f4174e1",
+      "result": "allocation_only",
+      "note": "Allocation record only; public programme unverified.",
+      "recommendedSource": "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf",
+      "suppliedSources": [
+        "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf"
+      ]
+    },
+    {
+      "rowNumber": 58,
+      "name": "Regional Oldtimers Hockey",
+      "fingerprint": "4586c7be612651a6255fcb6b016283688f273bd9a324376f0b015ec97b318170",
+      "result": "allocation_only",
+      "note": "Allocation record only; public programme unverified.",
+      "recommendedSource": "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf",
+      "suppliedSources": [
+        "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf"
+      ]
+    },
+    {
+      "rowNumber": 59,
+      "name": "Thomas Neal Hockey / SVMHL",
+      "fingerprint": "bada5c1af7da11ab7eb75b3f448f511d4b0aad646e7aa5cbddd9bfefc7a61429",
+      "result": "allocation_only",
+      "note": "Allocation record only; public programme unverified.",
+      "recommendedSource": "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf",
+      "suppliedSources": [
+        "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf"
+      ]
+    },
+    {
+      "rowNumber": 60,
+      "name": "Thursday Night Oldtimers",
+      "fingerprint": "28f85a69d58342dacc1a1ea2b48e542c7fbfe0080bada1f2688d6af4be928a36",
+      "result": "allocation_only",
+      "note": "Allocation record only; public programme unverified.",
+      "recommendedSource": "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf",
+      "suppliedSources": [
+        "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf"
+      ]
+    },
+    {
+      "rowNumber": 61,
+      "name": "Toronto Over 50 Oldtimers",
+      "fingerprint": "b17eddb23596d86cd4cf52fb627e271e6bec175a898b7ab77cd7424bf0d90b2a",
+      "result": "allocation_only",
+      "note": "Allocation record only; public programme unverified.",
+      "recommendedSource": "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf",
+      "suppliedSources": [
+        "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf"
+      ]
+    },
+    {
+      "rowNumber": 62,
+      "name": "Wednesday Nite Oldtimers",
+      "fingerprint": "37b391ce24d9aba08daf5ff9bed29b64f819156c1572b34b985ba665ef4232ca",
+      "result": "allocation_only",
+      "note": "Allocation record only; public programme unverified.",
+      "recommendedSource": "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf",
+      "suppliedSources": [
+        "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf"
+      ]
+    },
+    {
+      "rowNumber": 63,
+      "name": "West Mall Oldtimers Hockey League",
+      "fingerprint": "f93a2252155ebfcf85ab509e5d4fa1419055ee80b9004adaac6a7c4e97bd7ed4",
+      "result": "allocation_only",
+      "note": "Allocation record only; public programme unverified.",
+      "recommendedSource": "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf",
+      "suppliedSources": [
+        "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf"
+      ]
+    },
+    {
+      "rowNumber": 64,
+      "name": "Jewnity Hockey",
+      "fingerprint": "57872d96968f9a825a962b280d8e49393eace9caf5a8bf39bf5f6a873836a482",
+      "result": "source_update",
+      "note": "Replacement official domain describes men's hockey in Maple. It offers registration notifications, not proof of open enrollment.",
+      "recommendedSource": "https://www.jewnity.ca/leagues/hockey/",
+      "suppliedSources": [
+        "https://jewnity.com/"
+      ]
+    },
+    {
+      "rowNumber": 65,
+      "name": "Scotiabank Pond adult hockey",
+      "fingerprint": "fead66a0a775e3c0820b894f0a83e767f72b9c85b35216c363bf102413314e08",
+      "result": "entity_split",
+      "note": "Chesswood official page also names Scotiabank Pond. Possible shared programme with row 26; avoid a duplicate listing.",
+      "recommendedSource": "https://www.chesswoodarena.com/leagues/custom_page.cfm?clientID=6582&leagueID=30279&pageID=19058",
+      "suppliedSources": []
+    },
+    {
+      "rowNumber": 66,
+      "name": "NTR Richmond Hill adult hockey",
+      "fingerprint": "a06d68d927666f05c12e972331b6c61ba296c59f0be7cbd4e8755f54a43e3577",
+      "result": "source_update",
+      "note": "Official NTR page found for missing source; supports Richmond Hill adult 3-on-3 programme.",
+      "recommendedSource": "https://ntrcanada.com/richmond-hill/3on3-leagues/fall-winter-adult-leagues/summer-adult-leagues-information/",
+      "suppliedSources": []
+    },
+    {
+      "rowNumber": 67,
+      "name": "Vaughan Sports Leagues – Ice Hockey",
+      "fingerprint": "1081623fe562e725ba7239282d7105e917f78da1a6dbf719970cae7c64ac38ac",
+      "result": "primary_supported",
+      "note": "Municipal page identifies a 50+ ice hockey league. Preserve eligibility rather than describing unrestricted adult hockey.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://www.vaughan.ca/residential/recreation-services/vaughan-sports-leagues"
+      ]
+    },
+    {
+      "rowNumber": 68,
+      "name": "Women's Hockey Club of Toronto",
+      "fingerprint": "51163a651ab612e2e2becb372a12b5269c88c65926e0715c40a9b7fe6ae6d9ba",
+      "result": "primary_supported",
+      "note": "Official site supports 2026/27 league identity and waitlist. Review allocation-derived applicant flag separately.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://whct.ca/",
+        "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf"
+      ]
+    },
+    {
+      "rowNumber": 69,
+      "name": "Good Times Hockey League of the Arts",
+      "fingerprint": "895ae811bfb496d466ab79c8d2f4dec18165501a94b1e113eeae6a46fc90a831",
+      "result": "primary_supported",
+      "note": "Official site supports league identity and schedules. Review allocation-derived applicant flag separately.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://gthla.ca/",
+        "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf"
+      ]
+    },
+    {
+      "rowNumber": 70,
+      "name": "Etobicoke Dolphins – Senior Ladies",
+      "fingerprint": "b9aa507ca0d80f83871ca33b29a36fc608b28938d5814be69185ad4e19abfa06",
+      "result": "entity_split",
+      "note": "Official Ladies 18+ page supports a specific division; distinguish it from 35+ and reconcile conflicting registration messages.",
+      "recommendedSource": "https://etobicokedolphins.ca/Pages/1810/Ladies_18_/",
+      "suppliedSources": [
+        "https://etobicokedolphins.ca/Pages/1002/About_EDGHL/",
+        "https://etobicokedolphins.ca/contact/",
+        "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf"
+      ]
+    },
+    {
+      "rowNumber": 71,
+      "name": "Scarborough Women's Hockey League",
+      "fingerprint": "128bbf9ce03fc64039ea7db3a101e48c6c60bc6d0bbbe267ad1e5289b214f719",
+      "result": "primary_supported",
+      "note": "Official schedule supports 2026/27 league identity. Review allocation-derived applicant flag separately.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://swhlwildcats.com/schedule.shtml",
+        "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf"
+      ]
+    },
+    {
+      "rowNumber": 72,
+      "name": "Toronto Leaside – Senior House League",
+      "fingerprint": "328ddcd4fddeae926348b5f65e7f1850a0ae5578f0a16b379febec2c35a77461",
+      "result": "location_only",
+      "note": "Venue page describes an adult senior league. Obtain operator programme source before resolving applicant classification.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://leasidegardens.com/arenas/",
+        "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf"
+      ]
+    },
+    {
+      "rowNumber": 73,
+      "name": "H.E.T.I. Adults",
+      "fingerprint": "cb22e291f8c1befb7a666c6fcd38526029bb720172985035cf5a3e7d2e6aac3a",
+      "result": "allocation_only",
+      "note": "Allocation record only; public programme unverified.",
+      "recommendedSource": "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf",
+      "suppliedSources": [
+        "https://www.toronto.ca/wp-content/uploads/2026/04/97bf-978a-ice-allocation-entitlements-2025-2026-1.pdf"
+      ]
+    },
+    {
+      "rowNumber": 74,
+      "name": "Toronto Gay Hockey Association",
+      "fingerprint": "cd6cbb547d032e068dd4133e01ae2ec54eb8a964ee87c5a71663cd19252b3b12",
+      "result": "primary_supported",
+      "note": "Official about page identifies an inclusive adult 19+ non-contact league.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://gayhockey.hockeyshift.com/about",
+        "https://toronto.sportaholik.com/category/hockey-ice/"
+      ]
+    },
+    {
+      "rowNumber": 75,
+      "name": "Golden Blades Women's Hockey League",
+      "fingerprint": "190fa61ddb71672881c7937dfab3863012c9846ebd218e4a3d9766b0a1779905",
+      "result": "entity_split",
+      "note": "Official site describes adult women's divisions at different venues. Map division and venue separately.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://goldenbladeshockey.com/"
+      ]
+    },
+    {
+      "rowNumber": 76,
+      "name": "Hockey Toronto Sunday League",
+      "fingerprint": "1a070375c52bd40d3a662a6ff883cf333d2e18600709fb1e8bbf9d1b9a25e9be",
+      "result": "unresolved",
+      "note": "Official programme URL returned an error. Current Sunday league details remain unverified.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://www.hockeytoronto.com/index.cfm?pages=440",
+        "https://recsportsteam.com/blog/greater-toronto-hockey-leagues/"
+      ]
+    },
+    {
+      "rowNumber": 77,
+      "name": "Friday Night Hockey League",
+      "fingerprint": "f645314a07b680b7834b1951c2e476afab8436a761815d1269a523a0d5583b42",
+      "result": "unresolved",
+      "note": "Supplied domain was inaccessible. Similarly named search results refer to another region; identity remains unresolved.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://www.fridaynighthockeyleague.ca/",
+        "https://recsportsteam.com/blog/greater-toronto-hockey-leagues/",
+        "https://toronto.sportaholik.com/category/hockey-ice/"
+      ]
+    },
+    {
+      "rowNumber": 78,
+      "name": "Hockey Extreme – Women's Summer League",
+      "fingerprint": "d0a74f42e7bf55757589a6c791061eb0a7ce2d636a739e60cf99327e96a824b2",
+      "result": "seasonal_only",
+      "note": "Official page describes summer 2026, now past. Do not infer a later season or availability.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://www.hockeyextreme.ca/blog/womens-non-slap-shot-league"
+      ]
+    },
+    {
+      "rowNumber": 79,
+      "name": "Hockey Extreme – Adult Coed Summer League",
+      "fingerprint": "412ce576d2882acfe6a7ed549d2212a6bbead3fb08f8b503380c762947eb9a27",
+      "result": "seasonal_only",
+      "note": "Official page explicitly retains previous-season 2025 dates. Current season remains unknown.",
+      "recommendedSource": null,
+      "suppliedSources": [
+        "https://www.hockeyextreme.ca/blog/adult-coed-league"
+      ]
+    }
+  ]
+}

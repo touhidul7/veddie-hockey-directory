@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { validateSubmission } = require('../middleware/validateSubmission');
 const crypto = require('crypto');
 const {
   getDb
@@ -10,7 +11,7 @@ const {
  * Submits listing claims, corrections, additions, or removal requests.
  * Acceptance A11, A13: Enqueues for manual admin review. NEVER automatically mutates live records.
  */
-router.post('/', async (req, res) => {
+router.post('/', validateSubmission('listing'), async (req, res) => {
   const db = getDb();
   const {
     request_type,
@@ -55,12 +56,15 @@ router.post('/', async (req, res) => {
   }
   const requestId = `req_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
   const now = new Date().toISOString();
+  await db.transaction(async()=>{
   await db.run(`
     INSERT INTO rinkcircuit.listing_requests (
       id, request_type, programme_id, suggested_name, requester_name,
       requester_email, requester_role, evidence_url, message, status, created_at
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)
   `, requestId, request_type, programme_id || null, suggested_name || null, requester_name.trim(), requester_email.trim().toLowerCase(), requester_role || 'Visitor', evidence_url ? evidence_url.trim() : null, message ? message.trim() : null, now);
+  await require('../services/analytics').record('listing_request_submitted');
+  });
   res.status(201).json({
     success: true,
     request_id: requestId,

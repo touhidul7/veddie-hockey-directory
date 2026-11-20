@@ -1,3 +1,4 @@
+import useDialog from './useDialog';
 import React, { useState } from 'react';
 import { X, Send, CheckCircle2, AlertCircle } from 'lucide-react';
 
@@ -12,6 +13,7 @@ export default function CorrectionModal({ isOpen, onClose, programmeId, programm
   const [submittedReceipt, setSubmittedReceipt] = useState(null);
   const [error, setError] = useState(null);
 
+  const dialogRef=useDialog(isOpen,onClose);
   if (!isOpen) return null;
 
   async function handleSubmit(e) {
@@ -57,10 +59,10 @@ export default function CorrectionModal({ isOpen, onClose, programmeId, programm
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs">
+    <div ref={dialogRef} role="dialog" aria-modal="true" aria-label="Listing request" tabIndex={-1} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs">
       <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in-95 duration-150 max-h-[90vh] overflow-y-auto">
         <button
-          onClick={handleResetAndClose}
+          aria-label="Close dialog" onClick={handleResetAndClose}
           className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100"
         >
           <X className="w-5 h-5" />

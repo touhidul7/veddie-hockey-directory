@@ -1,3 +1,4 @@
+import {setMetadata} from '../lib/metadata';
 import React, { useState, useEffect } from 'react';
 import { Users, MapPin, Award, ChevronLeft, Shield, Calendar, Trophy } from 'lucide-react';
 
@@ -7,22 +8,25 @@ export default function TeamProfilePage({ slug, navigate }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    const controller=new AbortController();
     async function fetchTeam() {
-      setLoading(true);
+      setLoading(true);setTeam(null);
       setError(null);
       try {
-        const res = await fetch(`/api/teams/${slug}`);
+        const res = await fetch(`/api/teams/${encodeURIComponent(slug)}`,{signal:controller.signal});
         if (!res.ok) throw new Error('Team profile not found or pending review.');
         const data = await res.json();
-        setTeam(data.data);
+        if(!controller.signal.aborted)setTeam(data.data);
       } catch (err) {
-        setError(err.message);
+        if(!controller.signal.aborted)setError(err.message);
       } finally {
-        setLoading(false);
+        if(!controller.signal.aborted)setLoading(false);
       }
     }
-    fetchTeam();
+    fetchTeam();return()=>controller.abort();
   }, [slug]);
+
+  useEffect(()=>{if(team)setMetadata(team.name+' | RinkCircuit',true,'Approved public team information. Captain contact details remain private.');},[team]);
 
   if (loading) {
     return (

@@ -19,6 +19,13 @@ function getLocalIpAddresses() {
 }
 
 const app = express();
+app.disable('x-powered-by');
+app.use((req,res,next)=>{
+  req.requestId=require('node:crypto').randomUUID();
+  res.set('X-Request-ID',req.requestId).set('X-Content-Type-Options','nosniff').set('Referrer-Policy','strict-origin-when-cross-origin').set('X-Frame-Options','DENY');
+  if(req.path.startsWith('/api/admin'))res.set('Cache-Control','no-store');
+  next();
+});
 const PORT = process.env.PORT || 3001;
 
 // CORS setup
@@ -29,6 +36,7 @@ app.use(cors({
 }));
 
 // Body parsing with sane payload limits (Acceptance A22)
+app.use(require('./middleware/rateLimit').submissionRateLimit);
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 
@@ -45,16 +53,24 @@ app.use((req, res, next) => {
 });
 
 // Health check
-app.get('/api/health', (req, res) => {
+app.get('/api/health', async (req, res) => {
+  try {
+    await require('./db/database').getDb().get('SELECT count(*) FROM rinkcircuit.schema_migrations');
+  } catch {
+    return res.status(503).json({ status: 'unavailable', service: 'RinkCircuit API', database: 'unavailable' });
+  }
   res.json({
     status: 'healthy',
     service: 'RinkCircuit API',
+    database: 'postgresql',
     version: '1.0.0',
     timestamp: new Date().toISOString()
   });
 });
 
 // API Routes
+app.use('/api/jobs/email', require('./routes/emailJobs'));
+app.use('/api/analytics', require('./routes/analytics'));
 app.use('/api/leagues', require('./routes/leagues'));
 app.use('/api/events', require('./routes/events'));
 app.use('/api/teams', require('./routes/teams'));
@@ -64,38 +80,36 @@ app.use('/api/email-verifications', require('./routes/verifications'));
 app.use('/api/listing-requests', require('./routes/listingRequests'));
 app.use('/api/admin', require('./routes/admin'));
 
-// Acceptance Test Runner Endpoint
-app.get('/api/admin-tests/run', async (req, res) => {
-  const token = req.headers['x-admin-token'] || (req.headers.authorization ? req.headers.authorization.replace('Bearer ', '') : null);
-  if (token !== 'plaionn-admin-key') {
-    return res.status(401).json({ error: 'Admin authorization required' });
-  }
-
-  try {
-    const { runAllAcceptanceTests } = require('../tests/acceptance.test');
-    const results = await runAllAcceptanceTests();
-    res.json(results);
-  } catch (err) {
-    res.status(500).json({ error: err.message, stack: err.stack });
-  }
+// Read-only database diagnostics. Full tests run in an isolated schema via npm test.
+app.get('/api/admin-tests/run', require('./middleware/adminSession').requireAdmin, async (req, res) => {
+  const {getDb} = require('./db/database');
+  const tables = [...require('./db/tables.json'), 'admin_sessions'];
+  const rows = await getDb().all("SELECT tablename, rowsecurity FROM pg_tables WHERE schemaname = 'rinkcircuit'");
+  const results = tables.map(name => ({id:name,title:name,passed:rows.some(row => row.tablename===name && row.rowsecurity),details:'Table exists with row-level security enabled'}));
+  const passed=results.filter(row=>row.passed).length;
+  res.json({total:results.length,passed,allPassed:passed===results.length,results});
 });
+
+app.use(require('./routes/seo').router);
 
 // Serve frontend build in production
 const distPath = path.join(__dirname, '..', 'dist');
 if (fs.existsSync(distPath)) {
-  app.use(express.static(distPath));
+
+  app.use(require('./routes/seo').html);
+  app.use(express.static(distPath,{index:false}));
   app.use((req, res, next) => {
     if (req.path.startsWith('/api')) return next();
-    res.sendFile(path.join(distPath, 'index.html'));
+    res.status(404).set('X-Robots-Tag','noindex').type('text/plain').send('Not found');
   });
 }
 
 // Global safe error handler (Acceptance A04, A22)
 app.use((err, req, res, next) => {
-  console.error('[API Error]:', err);
+  console.error('[API Error]:', err.code || err.name);
   res.status(err.status || 500).json({
-    error: err.message || 'An unexpected server error occurred.',
-    code: err.code || 'INTERNAL_ERROR'
+    error: err.status && err.status < 500 ? err.message : 'An unexpected server error occurred.',
+    code: err.status&&err.status<500?(err.code||'INVALID_REQUEST'):'INTERNAL_ERROR',request_id:req.requestId
   });
 });
 

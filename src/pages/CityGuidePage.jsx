@@ -41,7 +41,7 @@ export default function CityGuidePage({ province, city, navigate, onExternalClic
     return (
       <div className="max-w-md mx-auto px-4 py-16 text-center space-y-4">
         <h2 className="text-xl font-bold text-slate-900">City Guide Not Found</h2>
-        <p className="text-xs text-slate-500">{error || 'This municipality guide is not published yet.'}</p>
+        <p className="text-xs text-slate-600">{error || 'This municipality guide is not published yet.'}</p>
         <button
           onClick={() => navigate('/leagues')}
           className="px-4 py-2 text-xs font-semibold text-white bg-blue-600 rounded-lg"
@@ -53,12 +53,29 @@ export default function CityGuidePage({ province, city, navigate, onExternalClic
   }
 
   const { meta, leagues } = data;
+  const sponsoredLeagues = leagues.filter(league => Number(league.is_sponsored) === 1);
+  const organicLeagues = leagues.filter(league => Number(league.is_sponsored) !== 1);
+
+  function renderLeagueCards(items) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {items.map(league => (
+          <LeagueCard
+            key={league.id}
+            league={league}
+            onSelect={slug => navigate(`/leagues/${slug}`)}
+            onExternalClick={onExternalClick}
+          />
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       <button
         onClick={() => navigate('/leagues')}
-        className="text-xs font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1"
+        className="text-xs font-semibold text-slate-600 hover:text-slate-800 flex items-center gap-1"
       >
         <ChevronLeft className="w-4 h-4" />
         <span>Back to GTA League Finder</span>
@@ -82,7 +99,7 @@ export default function CityGuidePage({ province, city, navigate, onExternalClic
         {/* Key Arenas */}
         {meta.arenas && meta.arenas.length > 0 && (
           <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center gap-2 text-xs">
-            <span className="text-slate-400 font-medium">Major Arenas:</span>
+            <span className="text-slate-600 font-medium">Major Arenas:</span>
             {meta.arenas.map((a) => (
               <span key={a} className="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md font-medium">
                 {a}
@@ -97,9 +114,9 @@ export default function CityGuidePage({ province, city, navigate, onExternalClic
         <div className="flex justify-between items-center">
           <div>
             <h2 className="text-xl font-bold text-slate-900">
-              Active Leagues in {meta.name} ({leagues.length})
+              Published League Listings in {meta.name} ({leagues.length})
             </h2>
-            <p className="text-xs text-slate-500">Verified adult ice and ball hockey programmes operating in this area</p>
+            <p className="text-xs text-slate-600">Published listings do not confirm current registration availability.</p>
           </div>
 
           <button
@@ -112,19 +129,23 @@ export default function CityGuidePage({ province, city, navigate, onExternalClic
         </div>
 
         {leagues.length === 0 ? (
-          <div className="bg-white rounded-xl border border-slate-200 p-8 text-center text-xs text-slate-500">
+          <div className="bg-white rounded-xl border border-slate-200 p-8 text-center text-xs text-slate-600">
             No published leagues currently indexed in this city. Check nearby GTA regions.
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {leagues.map((league) => (
-              <LeagueCard
-                key={league.id}
-                league={league}
-                onSelect={(slug) => navigate(`/leagues/${slug}`)}
-                onExternalClick={onExternalClick}
-              />
-            ))}
+          <div className="space-y-6">
+            {sponsoredLeagues.length > 0 && (
+              <section aria-label="Sponsored listings" className="space-y-3">
+                <h3 className="text-sm font-bold text-slate-700">Sponsored listings</h3>
+                {renderLeagueCards(sponsoredLeagues)}
+              </section>
+            )}
+            {organicLeagues.length > 0 && (
+              <section aria-label="Directory listings" className="space-y-3">
+                {sponsoredLeagues.length > 0 && <h3 className="text-sm font-bold text-slate-700">Directory listings</h3>}
+                {renderLeagueCards(organicLeagues)}
+              </section>
+            )}
           </div>
         )}
       </div>

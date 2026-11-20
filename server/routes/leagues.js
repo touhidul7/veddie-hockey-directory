@@ -10,11 +10,13 @@ const {
  */
 router.get('/', async (req, res) => {
   const db = getDb();
+  if(Object.values(req.query).some(value=>typeof value!=='string'||value.length>500))return res.status(400).json({error:'Invalid search parameters.'});
   const {
     q,
     city,
     category,
     season,
+    age,
     night,
     level,
     reg,
@@ -64,56 +66,26 @@ router.get('/', async (req, res) => {
   }
 
   // Sport type filter (Ice hockey default vs Ball hockey)
-  if (sport && sport.trim()) {
+  if (sport && sport.trim() !== 'all') {
+    if (!['ice_hockey', 'ball_hockey'].includes(sport.trim().toLowerCase())) return res.status(400).json({error:'Choose a valid sport type.'});
     whereClauses.push('p.sport_type = ?');
     params.push(sport.trim().toLowerCase());
   }
 
-  // Season Offering Filters (AND logic between filters)
-  if (season && season.trim()) {
-    whereClauses.push(`EXISTS (
-      SELECT 1 FROM rinkcircuit.season_offerings so
-      WHERE so.programme_id = p.id AND lower(so.season_label) LIKE ?
-    )`);
-    params.push(`%${season.trim().toLowerCase()}%`);
+  // All offering filters must match the SAME season offering.
+  const offeringFilters=[];
+  for(const [value,column] of [[season,'season_label'],[age,'age_eligibility'],[level,'skill_labels'],[reg,'registration_modes']]){
+    if(value?.trim()){offeringFilters.push(`lower(so.${column}) LIKE ?`);params.push(`%${value.trim().toLowerCase()}%`);}
   }
-
-  // Night filter (Acceptance A01: "unknown night not falsely matched")
-  if (night && night.trim()) {
-    whereClauses.push(`EXISTS (
-      SELECT 1 FROM rinkcircuit.season_offerings so
-      WHERE so.programme_id = p.id 
-      AND so.nights IS NOT NULL 
-      AND lower(so.nights) LIKE ?
-    )`);
-    params.push(`%${night.trim().toLowerCase()}%`);
+  if(night?.trim()){
+    if(!['monday','tuesday','wednesday','thursday','friday','saturday','sunday'].includes(night.toLowerCase()))return res.status(400).json({error:'Choose a valid night.'});
+    offeringFilters.push('lower(so.nights) LIKE ?');params.push(`%"${night.toLowerCase()}"%`);
   }
-
-  // Skill level filter
-  if (level && level.trim()) {
-    whereClauses.push(`EXISTS (
-      SELECT 1 FROM rinkcircuit.season_offerings so
-      WHERE so.programme_id = p.id 
-      AND so.skill_labels IS NOT NULL 
-      AND lower(so.skill_labels) LIKE ?
-    )`);
-    params.push(`%${level.trim().toLowerCase()}%`);
-  }
-
-  // Registration mode filter (individual / team)
-  if (reg && reg.trim()) {
-    whereClauses.push(`EXISTS (
-      SELECT 1 FROM rinkcircuit.season_offerings so
-      WHERE so.programme_id = p.id 
-      AND so.registration_modes IS NOT NULL 
-      AND lower(so.registration_modes) LIKE ?
-    )`);
-    params.push(`%${reg.trim().toLowerCase()}%`);
-  }
+  if(offeringFilters.length)whereClauses.push(`EXISTS (SELECT 1 FROM rinkcircuit.season_offerings so WHERE so.programme_id=p.id AND ${offeringFilters.join(' AND ')})`);
 
   // Sorting
   const countParams = [...params];
-  let orderBy = 'p.is_sponsored DESC, p.priority_score DESC, p.name ASC';
+  let orderBy = 'p.name ASC';
   if (sort === 'name') {
     orderBy = 'p.name ASC';
   } else if (sort === 'city') {
@@ -139,41 +111,9 @@ router.get('/', async (req, res) => {
   const finalParams = [...params, pageLimit, pageOffset];
   const leagues = await db.all(query, ...finalParams);
 
-  // Attach offerings to each league
-  const offeringStmt = `
-    SELECT
-      so.id, so.season_label, so.skill_labels, so.nights, so.age_eligibility,
-      so.registration_modes, so.registration_status, so.fee_amount, so.fee_currency,
-      so.fee_unit, so.fee_notes, so.registration_url, so.last_checked_at
-    FROM rinkcircuit.season_offerings so
-    WHERE so.programme_id = ?
-  `;
-  const arenasStmt = `
-    SELECT a.id, a.name, a.address, a.city
-    FROM rinkcircuit.arenas a
-    JOIN rinkcircuit.offering_arenas oa ON a.id = oa.arena_id
-    WHERE oa.offering_id = ?
-  `;
-  const enrichedLeagues = await Promise.all(leagues.map(async l => {
-    const offerings = await Promise.all((await db.all(offeringStmt, l.id)).map(async o => {
-      let nights = [];
-      try {
-        nights = JSON.parse(o.nights || '[]');
-      } catch {
-        nights = [o.nights];
-      }
-      const arenas = await db.all(arenasStmt, o.id);
-      return {
-        ...o,
-        nights,
-        arenas
-      };
-    }));
-    return {
-      ...l,
-      offerings
-    };
-  }));
+  // Fetch offerings and arenas in two bounded queries, not per result.
+  const offeringsByProgramme=await require('../services/publicOfferings').forProgrammes(leagues.map(l=>l.id));
+  const enrichedLeagues=leagues.map(league=>({...league,offerings:offeringsByProgramme.get(league.id)||[]}));
 
   // Count total matches
   const countQuery = `
@@ -216,7 +156,8 @@ router.get('/:slug', async (req, res) => {
     WHERE p.slug = ? AND p.publication_status = 'published'
   `, slug); // 2. If not found, check slug_redirects (Acceptance A18: "Old slug redirects")
   if (!programme) {
-    const redirect = await db.get("SELECT new_slug FROM rinkcircuit.slug_redirects WHERE old_slug = ?", slug);
+    const resolved = await require('../services/slugResolver').resolveLeagueSlug(slug);
+    const redirect=resolved&&resolved.slug!==slug?{new_slug:resolved.slug}:null;
     if (redirect) {
       return res.status(301).json({
         redirect: true,
@@ -229,33 +170,8 @@ router.get('/:slug', async (req, res) => {
     });
   }
 
-  // Fetch offerings with arenas
-  const offerings = await Promise.all((await db.all(`
-    SELECT
-      so.id, so.season_label, so.skill_labels, so.nights, so.age_eligibility,
-      so.registration_modes, so.registration_status, so.fee_amount, so.fee_currency,
-      so.fee_unit, so.fee_notes, so.registration_url, so.last_checked_at
-    FROM rinkcircuit.season_offerings so
-    WHERE so.programme_id = ?
-  `, programme.id)).map(async o => {
-    let nights = [];
-    try {
-      nights = JSON.parse(o.nights || '[]');
-    } catch {
-      nights = [o.nights];
-    }
-    const arenas = await db.all(`
-      SELECT a.id, a.name, a.address, a.city, a.postal_code
-      FROM rinkcircuit.arenas a
-      JOIN rinkcircuit.offering_arenas oa ON a.id = oa.arena_id
-      WHERE oa.offering_id = ?
-    `, o.id);
-    return {
-      ...o,
-      nights,
-      arenas
-    };
-  })); // Fetch source evidence citations (Acceptance A03)
+  const offerings=(await require('../services/publicOfferings').forProgrammes([programme.id])).get(programme.id)||[];
+  // Fetch source evidence citations (Acceptance A03)
   const evidence = await db.all(`
     SELECT id, url, source_type, retrieved_at, checked_at, evidence_summary
     FROM rinkcircuit.source_evidence
@@ -271,7 +187,7 @@ router.get('/:slug', async (req, res) => {
     data: {
       ...programme,
       offerings,
-      evidence,
+      evidence:evidence.map(item=>({...item,url:require('../services/publicOfferings').safeUrl(item.url)})),
       related
     }
   });

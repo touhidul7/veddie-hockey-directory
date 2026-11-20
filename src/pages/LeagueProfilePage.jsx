@@ -1,3 +1,5 @@
+import {track} from '../lib/analytics';
+import {setMetadata} from '../lib/metadata';
 import React, { useState, useEffect } from 'react';
 import {
   MapPin, Calendar, Award, ExternalLink, ShieldCheck, CheckCircle2,
@@ -10,11 +12,12 @@ export default function LeagueProfilePage({ slug, navigate, onExternalClick, onO
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    const controller=new AbortController();
     async function fetchProfile() {
-      setLoading(true);
+      setLoading(true);setLeague(null);
       setError(null);
       try {
-        const res = await fetch(`/api/leagues/${slug}`);
+        const res = await fetch(`/api/leagues/${encodeURIComponent(slug)}`,{signal:controller.signal});
         if (res.status === 301) {
           const redirectData = await res.json();
           navigate(`/leagues/${redirectData.new_slug}`);
@@ -24,21 +27,23 @@ export default function LeagueProfilePage({ slug, navigate, onExternalClick, onO
           throw new Error('League profile not found or listing not published.');
         }
         const data = await res.json();
-        setLeague(data.data);
+        if(!controller.signal.aborted)setLeague(data.data);
       } catch (err) {
-        setError(err.message);
+        if(!controller.signal.aborted)setError(err.message);
       } finally {
-        setLoading(false);
+        if(!controller.signal.aborted)setLoading(false);
       }
     }
-    fetchProfile();
+    fetchProfile();return()=>controller.abort();
   }, [slug]);
+
+  useEffect(()=>{if(league){setMetadata(league.name+' | RinkCircuit',true,league.description||'Programme details and official sources. Check current details with the operator.');track('league_viewed');}},[league]);
 
   if (loading) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-12 animate-pulse space-y-6">
         <div className="h-6 w-32 bg-slate-200 rounded"></div>
-        <div className="h-10 w-96 bg-slate-200 rounded"></div>
+        <div className="h-10 w-full max-w-96 bg-slate-200 rounded"></div>
         <div className="h-64 bg-slate-200 rounded-xl"></div>
       </div>
     );
@@ -51,7 +56,7 @@ export default function LeagueProfilePage({ slug, navigate, onExternalClick, onO
           <AlertCircle className="w-6 h-6" />
         </div>
         <h2 className="text-xl font-bold text-slate-900">League Listing Not Found</h2>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-slate-600">
           {error || 'This listing may have been moved, renamed, or is currently unpublished for editorial review.'}
         </p>
         <div>
@@ -92,15 +97,22 @@ export default function LeagueProfilePage({ slug, navigate, onExternalClick, onO
     }
   };
 
-  const status = statusConfig[league.verification_status] || statusConfig.research_checked;
+  const status = statusConfig[league.verification_status] || statusConfig.needs_review;
   const StatusIcon = status.icon;
+  const sourceCheckedAt = primaryOffering.last_checked_at || league.last_checked_at;
+
+  function followInternalLink(event, path) {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    navigate(path);
+  }
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Navigation Breadcrumb */}
       <button
         onClick={() => navigate('/leagues')}
-        className="text-xs font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1 transition-colors"
+        className="text-xs font-semibold text-slate-600 hover:text-slate-800 flex items-center gap-1 transition-colors"
       >
         <ChevronLeft className="w-4 h-4" />
         <span>Back to League Finder</span>
@@ -109,9 +121,7 @@ export default function LeagueProfilePage({ slug, navigate, onExternalClick, onO
       {/* Main Profile Header */}
       <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full border shadow-2xs"
-            style={{ backgroundColor: status.bg.split(' ')[0], color: status.bg.split(' ')[1] }}
-          >
+          <div className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full border shadow-2xs ${status.bg}`}>
             <StatusIcon className="w-3.5 h-3.5" />
             <span>{status.label}</span>
           </div>
@@ -132,23 +142,26 @@ export default function LeagueProfilePage({ slug, navigate, onExternalClick, onO
             {league.name}
           </h1>
           <div className="flex flex-wrap items-center gap-3 text-xs sm:text-sm text-slate-600 mt-2">
-            <span className="font-semibold text-blue-700">{league.category}</span>
+            <span className="font-semibold text-blue-700">{league.category || 'Category not confirmed'}</span>
             <span>•</span>
             <span className="flex items-center gap-1 text-slate-700">
-              <MapPin className="w-3.5 h-3.5 text-slate-400" />
-              {league.area} ({league.municipality}, ON)
+              <MapPin className="w-3.5 h-3.5 text-slate-600" />
+              {league.area || 'Area not confirmed'} ({league.municipality || 'Municipality not confirmed'}, ON)
             </span>
           </div>
+          <p className="mt-3 text-sm text-slate-600 leading-relaxed">
+            {league.description || 'Programme summary not provided.'}
+          </p>
         </div>
 
         {/* Operator & Governance Disclosure */}
         <div className="bg-slate-50 rounded-xl p-3.5 text-xs text-slate-600 border border-slate-200 flex items-start gap-2.5">
-          <Building2 className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
+          <Building2 className="w-4 h-4 text-slate-600 shrink-0 mt-0.5" />
           <div className="leading-relaxed">
             <strong className="text-slate-800">Operator Disclosure: </strong>
-            {league.owner_disclosure || 'Independent adult hockey programme.'}
+            {league.owner_disclosure || 'Operator information is not confirmed.'}
             {league.organisation_name && (
-              <span className="ml-1 text-slate-500">
+              <span className="ml-1 text-slate-600">
                 Operating organisation: <strong>{league.organisation_name}</strong>.
               </span>
             )}
@@ -159,18 +172,20 @@ export default function LeagueProfilePage({ slug, navigate, onExternalClick, onO
         {primaryOffering.registration_url && (
           <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             <button
-              onClick={() => onExternalClick(primaryOffering.registration_url, league.name)}
+              type="button"
+              onClick={() => onExternalClick(primaryOffering.registration_url, league.name, 'external_registration_clicked')}
               className="bg-[#1463DF] hover:bg-blue-700 text-white font-semibold text-xs sm:text-sm px-6 py-3 rounded-xl shadow transition-colors flex items-center justify-center gap-2"
             >
               <span>Visit Official League Website / Registration</span>
               <ExternalLink className="w-4 h-4" />
             </button>
 
-            <span className="text-[11px] text-slate-400 text-center sm:text-left">
-              Outbound official link verified on {league.last_checked_at?.slice(0, 10) || 'recent crawl'}
+            <span className="text-[11px] text-slate-600 text-center sm:text-left">
+              {sourceCheckedAt ? `Source checked on ${sourceCheckedAt.slice(0, 10)}` : 'Source check date not recorded'}
             </span>
           </div>
         )}
+        {!primaryOffering.registration_url && <p className="text-sm text-slate-600">Official registration link not confirmed.</p>}
       </div>
 
       {/* Offering Breakdown & Arenas */}
@@ -180,62 +195,62 @@ export default function LeagueProfilePage({ slug, navigate, onExternalClick, onO
           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
             <h2 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
               <Calendar className="w-4 h-4 text-blue-600" />
-              <span>Current Programme Offerings</span>
+              <span>Programme and Season Details</span>
             </h2>
 
             <div className="space-y-4">
-              {league.offerings && league.offerings.map((off) => (
+              {league.offerings && league.offerings.length > 0 ? league.offerings.map((off) => (
                 <div key={off.id} className="bg-slate-50 rounded-xl p-4 border border-slate-200/80 space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="font-bold text-slate-900 text-sm">{off.season_label}</span>
+                  <div className="flex justify-between items-center gap-3">
+                    <span className="font-bold text-slate-900 text-sm">{off.season_label || 'Season not confirmed'}</span>
                     <span className="text-[11px] font-semibold bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded-full">
-                      {off.registration_status === 'open' ? '🟢 Registration Open' : 'Status: ' + off.registration_status}
+                      {off.registration_status === 'open' ? 'Registration Open' : off.registration_status === 'closed' ? 'Registration Closed' : off.registration_status === 'limited' ? 'Limited Registration' : off.registration_status === 'waitlist' ? 'Waitlist' : 'Status not confirmed'}
                     </span>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-700">
                     <div>
-                      <span className="text-slate-400 block text-[11px]">Playing Nights</span>
+                      <span className="text-slate-600 block text-[11px]">Playing Nights</span>
                       <span className="font-medium text-slate-900">
                         {off.nights?.length > 0 ? off.nights.join(', ') : 'Not confirmed'}
                       </span>
                     </div>
 
                     <div>
-                      <span className="text-slate-400 block text-[11px]">Age Eligibility</span>
-                      <span className="font-medium text-slate-900">{off.age_eligibility || '18+ Adult'}</span>
+                      <span className="text-slate-600 block text-[11px]">Age Eligibility</span>
+                      <span className="font-medium text-slate-900">                      {off.age_eligibility || 'Not confirmed'}</span>
                     </div>
 
                     <div>
-                      <span className="text-slate-400 block text-[11px]">Skill Labels (Source Description)</span>
+                      <span className="text-slate-600 block text-[11px]">Skill Labels (Source Description)</span>
                       <span className="font-medium text-slate-900">
-                        {off.skill_labels || 'Recreational tiers'}
+                        {off.skill_labels || 'Not confirmed'}
                       </span>
                     </div>
 
                     <div>
-                      <span className="text-slate-400 block text-[11px]">Registration Format</span>
-                      <span className="font-medium text-slate-900">{off.registration_modes || 'Team only'}</span>
+                      <span className="text-slate-600 block text-[11px]">Registration Format</span>
+                      <span className="font-medium text-slate-900">{off.registration_modes || 'Not confirmed'}</span>
                     </div>
                   </div>
 
                   {/* Fee Disclosure (Acceptance A03: Honest unknown labels when fee is null) */}
                   <div className="bg-white p-3 rounded-lg border border-slate-200 text-xs">
-                    <span className="text-slate-400 block text-[11px] mb-0.5">Published Pricing</span>
-                    {off.fee_amount ? (
+                    <span className="text-slate-600 block text-[11px] mb-0.5">Published Pricing</span>
+                    {off.fee_amount !== null && off.fee_amount !== undefined ? (
                       <div className="font-bold text-slate-900 text-sm">
-                        ${off.fee_amount.toLocaleString()} {off.fee_currency} <span className="text-xs font-normal text-slate-500">({off.fee_unit})</span>
-                        <p className="text-[11px] text-slate-500 font-normal mt-1">{off.fee_notes}</p>
+                        {off.fee_currency ? `${off.fee_currency} ` : ''}${Number(off.fee_amount).toLocaleString()}{off.fee_unit ? <span className="text-xs font-normal text-slate-600"> ({off.fee_unit})</span> : null}
+                        <p className="text-[11px] text-slate-600 font-normal mt-1">{off.fee_notes}</p>
                       </div>
                     ) : (
                       <div className="text-slate-600 text-xs">
-                        <span className="font-semibold text-slate-800">Fee not publicly published on source site.</span>
-                        <p className="text-[11px] text-slate-400 mt-0.5">{off.fee_notes || 'Contact league convenor for current seasonal team/player packages.'}</p>
+                        <span className="font-semibold text-slate-800">Fee not confirmed.</span>
+                        {off.fee_notes && <p className="text-[11px] text-slate-600 mt-0.5">{off.fee_notes}</p>}
                       </div>
                     )}
                   </div>
                 </div>
-              ))}
+              )) : <p className="text-sm text-slate-600">Season and offering details are not confirmed.</p>}
             </div>
           </div>
 
@@ -251,15 +266,13 @@ export default function LeagueProfilePage({ slug, navigate, onExternalClick, onO
                 {arenas.map((arena) => (
                   <div key={arena.id} className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1">
                     <div className="font-bold text-slate-800">{arena.name}</div>
-                    <div className="text-slate-500">{arena.address || 'GTA Arena'}</div>
-                    <div className="text-slate-400">{arena.city}, ON {arena.postal_code || ''}</div>
+                    <div className="text-slate-600">{arena.address || 'GTA Arena'}</div>
+                    <div className="text-slate-600">{arena.city}, ON {arena.postal_code || ''}</div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-slate-500 italic">
-                Local community rinks in {league.area}. Specific arena assignments scheduled by convenors upon division registration.
-              </p>
+              <p className="text-xs text-slate-600">Arena assignments are not confirmed.</p>
             )}
           </div>
         </div>
@@ -277,21 +290,23 @@ export default function LeagueProfilePage({ slug, navigate, onExternalClick, onO
               {league.evidence && league.evidence.length > 0 ? (
                 league.evidence.map((ev) => (
                   <div key={ev.id} className="p-2.5 bg-slate-50 rounded-lg border border-slate-200 text-[11px] space-y-1">
-                    <div className="font-mono text-slate-600 break-all">{ev.url}</div>
-                    <div className="text-slate-400 text-[10px]">
-                      Checked on: <strong className="text-slate-600">{ev.checked_at?.slice(0, 10) || 'Recent'}</strong>
+                    {ev.url ? (
+                      <a href={ev.url} onClick={()=>track('official_link_clicked')} target="_blank" rel="noopener noreferrer" className="font-medium text-blue-700 underline break-all" aria-label={`Open source evidence for ${league.name}`}>
+                        View source evidence
+                      </a>
+                    ) : <span className="text-slate-600">Source link unavailable.</span>}
+                    <div className="text-slate-600 text-[10px]">
+                      Checked on: <strong className="text-slate-600">{ev.checked_at?.slice(0, 10) || 'Date not recorded'}</strong>
                     </div>
                   </div>
                 ))
               ) : (
-                <div className="text-slate-400 text-xs">
-                  Citations verified through municipal ice records and league landing pages.
-                </div>
+                <div className="text-slate-600 text-xs">No source citations are currently available.</div>
               )}
             </div>
 
-            <p className="text-[10px] text-slate-400 leading-tight">
-              RinkCircuit verifies source evidence at regular intervals. Listings without recent confirmations show an updated review notice.
+            <p className="text-[10px] text-slate-600 leading-tight">
+              Source check dates describe the recorded review. Confirm current programme details with the official operator.
             </p>
           </div>
 
@@ -303,14 +318,15 @@ export default function LeagueProfilePage({ slug, navigate, onExternalClick, onO
               </h3>
               <div className="space-y-2 text-xs">
                 {league.related.map((rel) => (
-                  <div
+                  <a
                     key={rel.id}
-                    onClick={() => navigate(`/leagues/${rel.slug}`)}
-                    className="p-2.5 rounded-lg border border-slate-100 hover:border-blue-300 hover:bg-slate-50 cursor-pointer transition-colors"
+                    href={`/leagues/${rel.slug}`}
+                    onClick={event => followInternalLink(event, `/leagues/${rel.slug}`)}
+                    className="block p-2.5 rounded-lg border border-slate-100 hover:border-blue-300 hover:bg-slate-50 transition-colors"
                   >
                     <div className="font-semibold text-slate-800">{rel.name}</div>
-                    <div className="text-[11px] text-slate-400">{rel.category}</div>
-                  </div>
+                    <div className="text-[11px] text-slate-600">{rel.category}</div>
+                  </a>
                 ))}
               </div>
             </div>

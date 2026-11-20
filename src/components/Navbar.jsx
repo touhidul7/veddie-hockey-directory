@@ -22,20 +22,20 @@ export default function Navbar({ currentPath, navigate }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo & Brand */}
-          <div className="flex items-center space-x-3 cursor-pointer" onClick={() => handleNavigate('/')}>
+          <div className="flex items-center space-x-2 sm:space-x-3 cursor-pointer" onClick={() => handleNavigate('/')}>
             <div className="w-10 h-10 rounded-lg bg-[#1463DF] flex items-center justify-center font-bold text-xl tracking-wider text-white shadow-inner">
               🏒
             </div>
             <div>
               <div className="font-extrabold text-lg tracking-tight flex items-center gap-1.5 text-white">
-                RinkCircuit <span className="text-blue-400 font-semibold text-sm uppercase tracking-wider">HOCKEY</span>
+                RinkCircuit <span className="hidden sm:inline text-blue-400 font-semibold text-sm uppercase tracking-wider">HOCKEY</span>
               </div>
               <p className="text-[11px] text-slate-400 -mt-1 hidden sm:block">Greater Toronto Adult Directory</p>
             </div>
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-1 lg:space-x-2">
+          <nav className="hidden lg:flex items-center space-x-1 lg:space-x-2">
             {navLinks.map((item) => {
               const active = currentPath === item.path || (item.path !== '/' && currentPath.startsWith(item.path));
               return (
@@ -60,7 +60,7 @@ export default function Navbar({ currentPath, navigate }) {
           </nav>
 
           {/* Header Action & Mobile Menu Toggle */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-1 sm:space-x-3">
             <button
               onClick={() => handleNavigate('/admin')}
               className="text-xs text-slate-400 hover:text-slate-200 px-2 py-1 rounded border border-slate-700 hover:border-slate-500 transition-colors hidden sm:block"
@@ -71,7 +71,7 @@ export default function Navbar({ currentPath, navigate }) {
 
             <button
               onClick={() => handleNavigate('/leagues')}
-              className="bg-[#1463DF] hover:bg-blue-700 text-white font-medium text-xs sm:text-sm px-3.5 py-2 rounded-md shadow transition-colors flex items-center gap-1"
+              className="bg-[#1463DF] hover:bg-blue-700 text-white font-medium text-[11px] sm:text-sm px-2.5 sm:px-3.5 py-2 rounded-md shadow transition-colors flex items-center gap-1"
             >
               <Search className="w-3.5 h-3.5" />
               <span>Explore Leagues</span>
@@ -79,8 +79,10 @@ export default function Navbar({ currentPath, navigate }) {
 
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 focus:outline-none"
+              className="lg:hidden p-2 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 focus:outline-none"
               aria-label="Toggle Menu"
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-navigation"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -90,7 +92,7 @@ export default function Navbar({ currentPath, navigate }) {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[#12202B] border-b border-slate-800 px-4 pt-2 pb-5 space-y-1 shadow-xl">
+        <div id="mobile-navigation" className="lg:hidden bg-[#12202B] border-b border-slate-800 px-4 pt-2 pb-5 space-y-1 shadow-xl">
           {navLinks.map((item) => (
             <button
               key={item.path}

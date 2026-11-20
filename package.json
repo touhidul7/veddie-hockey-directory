@@ -11,7 +11,18 @@
     "build": "vite build",
     "preview": "vite preview --host",
     "seed": "node server/db/seed.js",
-    "test": "node tests/acceptance.test.js"
+    "test": "node tests/acceptance.test.js && node tests/moderation.test.js && node tests/importReview.test.js",
+    "db:migrate": "node server/db/migrate.js",
+    "db:status": "node server/db/status.js",
+    "test:unit": "node tests/database.test.js && node tests/submissions.test.js && node tests/rateLimit.test.js && node tests/smtp.test.js && node tests/adminSession.test.js && node tests/importCsv.test.js && node tests/sourceReview.test.js && node tests/backupEncryption.test.js",
+    "email:verify": "node server/services/smtpDelivery.js --verify",
+    "email:deliver": "node server/services/smtpDelivery.js",
+    "test:seo": "node tests/seo.test.js",
+    "test:analytics": "node tests/analytics.test.js",
+    "test:browser": "node tests/browser.test.js",
+    "test:performance": "node tests/performance.test.js",
+    "backup:export": "node scripts/backup.js",
+    "healthcheck": "node scripts/healthcheck.js"
   },
   "keywords": [],
   "author": "",
@@ -23,16 +34,22 @@
     "dotenv": "^18.0.10",
     "express": "^5.3.0",
     "lucide-react": "^1.70.0",
+    "nodemailer": "^10.5.0",
+    "pg": "^8.16.3",
     "react": "^19.3.1",
-    "react-dom": "^19.3.1",
-    "pg": "^8.16.3"
+    "react-dom": "^19.3.1"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.65.1",
     "@tailwindcss/vite": "^4.3.5",
     "@vitejs/plugin-react": "^6.2.1",
     "autoprefixer": "^10.6.2",
     "postcss": "^8.5.32",
     "tailwindcss": "^4.3.5",
     "vite": "^8.3.6"
+  },
+  "engines": {
+    "node": ">=22.12.0"
   }
 }

@@ -13,6 +13,7 @@ export default function CaptainsClubPage({ navigate }) {
     roster_size_estimate: 15,
     preferred_events: 'Tournaments & Champions League',
     marketing_consent: false,
+    publication_consent: false,
     additional_notes: ''
   });
 
@@ -41,6 +42,7 @@ export default function CaptainsClubPage({ navigate }) {
           division: formData.division,
           roster_size_estimate: formData.roster_size_estimate,
           marketing_consent: formData.marketing_consent,
+          publication_consent: formData.publication_consent,
           additional_notes: formData.additional_notes
         })
       });
@@ -112,9 +114,8 @@ export default function CaptainsClubPage({ navigate }) {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Captain Name *</label>
-                  <input
-                    type="text"
+                  <label htmlFor="captainsclubpage-field-1" className="block font-semibold text-slate-700 mb-1">Captain Name *</label>
+                  <input id="captainsclubpage-field-1" type="text"
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -123,9 +124,8 @@ export default function CaptainsClubPage({ navigate }) {
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Captain Email (Private) *</label>
-                  <input
-                    type="email"
+                  <label htmlFor="captainsclubpage-field-2" className="block font-semibold text-slate-700 mb-1">Captain Email (Private) *</label>
+                  <input id="captainsclubpage-field-2" type="email"
                     required
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -137,9 +137,8 @@ export default function CaptainsClubPage({ navigate }) {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Team Name (Public) *</label>
-                  <input
-                    type="text"
+                  <label htmlFor="captainsclubpage-field-3" className="block font-semibold text-slate-700 mb-1">Team Name (Public) *</label>
+                  <input id="captainsclubpage-field-3" type="text"
                     required
                     value={formData.team_name}
                     onChange={(e) => setFormData({ ...formData, team_name: e.target.value })}
@@ -148,9 +147,8 @@ export default function CaptainsClubPage({ navigate }) {
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Home City / Municipality *</label>
-                  <select
-                    value={formData.city}
+                  <label htmlFor="captainsclubpage-field-4" className="block font-semibold text-slate-700 mb-1">Home City / Municipality *</label>
+                  <select id="captainsclubpage-field-4" value={formData.city}
                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                     className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white"
                   >
@@ -169,9 +167,8 @@ export default function CaptainsClubPage({ navigate }) {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Current League or Independent</label>
-                  <input
-                    type="text"
+                  <label htmlFor="captainsclubpage-field-5" className="block font-semibold text-slate-700 mb-1">Current League or Independent</label>
+                  <input id="captainsclubpage-field-5" type="text"
                     value={formData.home_league}
                     onChange={(e) => setFormData({ ...formData, home_league: e.target.value })}
                     placeholder="e.g. Sports Village, True North, Independent"
@@ -179,9 +176,8 @@ export default function CaptainsClubPage({ navigate }) {
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Estimated Division / Tier</label>
-                  <select
-                    value={formData.division}
+                  <label htmlFor="captainsclubpage-field-6" className="block font-semibold text-slate-700 mb-1">Estimated Division / Tier</label>
+                  <select id="captainsclubpage-field-6" value={formData.division}
                     onChange={(e) => setFormData({ ...formData, division: e.target.value })}
                     className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white"
                   >
@@ -195,9 +191,8 @@ export default function CaptainsClubPage({ navigate }) {
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Estimated Active Roster Size</label>
-                <input
-                  type="number"
+                <label htmlFor="captainsclubpage-field-7" className="block font-semibold text-slate-700 mb-1">Estimated Active Roster Size</label>
+                <input id="captainsclubpage-field-7" type="number"
                   min="5"
                   max="30"
                   value={formData.roster_size_estimate}
@@ -206,6 +201,11 @@ export default function CaptainsClubPage({ navigate }) {
                 />
               </div>
 
+              <label className="flex items-start gap-2 text-xs text-slate-600">
+                <input type="checkbox" checked={formData.publication_consent}
+                  onChange={e => setFormData({ ...formData, publication_consent: e.target.checked })} />
+                <span>I authorize RinkCircuit to publish my team name, city, division and home league after review. Captain contact details and player information remain private. Without consent, my submission stays private.</span>
+              </label>
               {/* Marketing Opt-in Unchecked */}
               <div className="pt-2">
                 <label className="flex items-start gap-2 cursor-pointer select-none">

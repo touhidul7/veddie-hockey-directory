@@ -1,68 +1,20 @@
-const http = require('http');
-
-async function testServer() {
-  const app = require('../server/index');
-  const server = app.listen(3002, async () => {
-    console.log('Test server started on port 3002');
-    
-    function req(path, headers = {}) {
-      return new Promise((resolve, reject) => {
-        http.get({
-          hostname: 'localhost',
-          port: 3002,
-          path,
-          headers
-        }, (res) => {
-          let body = '';
-          res.on('data', chunk => body += chunk);
-          res.on('end', () => {
-            resolve({ status: res.statusCode, headers: res.headers, body });
-          });
-        }).on('error', reject);
-      });
+﻿const assert=require('node:assert/strict');
+const {closeDb}=require('../server/db/database');
+const app=require('../server/index');
+async function verifyServer(){
+  const server=app.listen(0,'127.0.0.1');
+  await new Promise(resolve=>server.once('listening',resolve));
+  try{
+    const origin=`http://127.0.0.1:${server.address().port}`;
+    for(const path of ['/api/health','/api/leagues?limit=2','/api/events','/api/teams','/api/locations']){
+      const response=await fetch(origin+path);assert.equal(response.status,200,path);await response.json();console.log('PASS '+path);
     }
-
-    try {
-      // 1. Health
-      const health = await req('/api/health');
-      console.log('Health check:', health.status, JSON.parse(health.body).status);
-
-      // 2. Static HTML
-      const home = await req('/');
-      console.log('Home HTML check:', home.status, home.body.includes('RinkCircuit') ? 'OK' : 'MISSING');
-
-      // 3. Leagues API
-      const leagues = await req('/api/leagues?limit=2');
-      const leaguesData = JSON.parse(leagues.body);
-      console.log('Leagues API check:', leagues.status, `Returned ${leaguesData.data.length} leagues (Total: ${leaguesData.pagination.total})`);
-
-      // 4. Events API
-      const events = await req('/api/events');
-      const eventsData = JSON.parse(events.body);
-      console.log('Events API check:', events.status, `Returned ${eventsData.data.length} events`);
-
-      // 5. Admin API (Unauthorized)
-      const adminUnauth = await req('/api/admin/overview');
-      console.log('Admin unauth check:', adminUnauth.status, '(expected 401)');
-
-      // 6. Admin API (Authorized)
-      const adminAuth = await req('/api/admin/overview', { 'x-admin-token': 'plaionn-admin-key' });
-      const adminData = JSON.parse(adminAuth.body);
-      console.log('Admin auth check:', adminAuth.status, `Counts: ${JSON.stringify(adminData.counts)}`);
-
-      // 7. Admin Test Matrix Runner API
-      const testRunner = await req('/api/admin-tests/run', { 'x-admin-token': 'plaionn-admin-key' });
-      const testData = JSON.parse(testRunner.body);
-      console.log('Admin Test Matrix check:', testRunner.status, `Passed ${testData.passed}/${testData.total} tests (allPassed: ${testData.allPassed})`);
-
-      console.log('\n🚀 ALL SERVER ENDPOINTS FULLY OPERATIONAL AND VERIFIED!\n');
-    } catch (err) {
-      console.error('Server test error:', err);
-    } finally {
-      server.close();
-      process.exit(0);
-    }
-  });
+    assert.equal((await fetch(origin+'/api/admin/overview')).status,401);
+    assert.equal((await fetch(origin+'/api/admin/overview',{headers:{'x-admin-token':process.env.ADMIN_TOKEN||'invalid'}})).status,401);
+    console.log('PASS admin rejects unauthenticated and legacy-key access');
+    const home=await fetch(origin+'/');assert.equal(home.status,200);assert.ok((await home.text()).includes('RinkCircuit'));
+    console.log('Read-only server smoke checks passed.');
+  }finally{await new Promise(resolve=>server.close(resolve));await closeDb();}
 }
-
-testServer();
+if(require.main===module)verifyServer().catch(error=>{console.error('Smoke check failed:',error.code||error.message);process.exitCode=1;});
+module.exports={verifyServer};

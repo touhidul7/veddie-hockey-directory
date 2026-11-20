@@ -4,13 +4,11 @@ import { ShieldCheck, Calendar, MapPin, Award, CheckCircle2, AlertCircle, ArrowU
 export default function LeagueCard({ league, onSelect, onExternalClick }) {
   const primaryOffering = (league.offerings && league.offerings[0]) || {};
   const nights = primaryOffering.nights || [];
-  const nightsText = nights.length > 0 ? nights.join(', ') : 'Days not confirmed';
-
-  // Format fee
-  let feeDisplay = 'Pricing on official site';
-  if (primaryOffering.fee_amount) {
-    feeDisplay = `$${primaryOffering.fee_amount.toLocaleString()} ${primaryOffering.fee_currency || 'CAD'} (${primaryOffering.fee_unit || 'per team'})`;
-  }
+  const nightsText = nights.length > 0 ? nights.join(', ') : 'Not confirmed';
+  const feeAmount = primaryOffering.fee_amount;
+  const feeDisplay = feeAmount === null || feeAmount === undefined
+    ? 'Not confirmed'
+    : `${primaryOffering.fee_currency ? `${primaryOffering.fee_currency} ` : ''}$${Number(feeAmount).toLocaleString()}${primaryOffering.fee_unit ? ` (${primaryOffering.fee_unit})` : ''}`;
 
   // Verification badge
   const statusConfig = {
@@ -31,8 +29,15 @@ export default function LeagueCard({ league, onSelect, onExternalClick }) {
     }
   };
 
-  const status = statusConfig[league.verification_status] || statusConfig.research_checked;
+  const status = statusConfig[league.verification_status] || statusConfig.needs_review;
   const StatusIcon = status.icon;
+  const isSponsored = Number(league.is_sponsored) === 1;
+
+  function handleProfileClick(event) {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    onSelect(league.slug);
+  }
 
   return (
     <div className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between overflow-hidden group">
@@ -50,61 +55,60 @@ export default function LeagueCard({ league, onSelect, onExternalClick }) {
                 Ball Hockey
               </span>
             ) : (
-              <span className="text-[11px] font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+              <span className="text-[11px] font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded">
                 Ice Hockey
               </span>
             )}
-            {league.is_sponsored === 1 && (
+            {isSponsored && (
               <span className="text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded border border-blue-200">
-                Partner
+                Sponsored
               </span>
             )}
           </div>
         </div>
 
         {/* League Title & Category */}
-        <h3
-          onClick={() => onSelect(league.slug)}
-          className="text-lg font-bold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors leading-snug mb-1"
-        >
-          {league.name}
+        <h3 className="text-lg font-bold leading-snug mb-1">
+          <a href={`/leagues/${league.slug}`} onClick={handleProfileClick} className="text-slate-900 group-hover:text-blue-600 transition-colors">
+            {league.name}
+          </a>
         </h3>
         <p className="text-xs text-blue-700 font-medium mb-3">
-          {league.category || 'Adult Recreational Ice'}
+          {league.category || 'Category not confirmed'}
         </p>
 
         {/* Location & Arenas */}
         <div className="space-y-1.5 text-xs text-slate-600 mb-4">
           <div className="flex items-center gap-1.5">
-            <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-            <span className="font-medium text-slate-800">{league.area}</span>
-            <span className="text-slate-400">({league.municipality})</span>
+            <MapPin className="w-3.5 h-3.5 text-slate-600 shrink-0" />
+            <span className="font-medium text-slate-800">{league.area || 'Area not confirmed'}</span>
+            <span className="text-slate-600">({league.municipality || 'Municipality not confirmed'})</span>
           </div>
 
           <div className="flex items-center gap-1.5">
-            <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+            <Calendar className="w-3.5 h-3.5 text-slate-600 shrink-0" />
             <span>{nightsText}</span>
             {primaryOffering.season_label && (
-              <span className="text-slate-400">• {primaryOffering.season_label}</span>
+              <span className="text-slate-600">• {primaryOffering.season_label}</span>
             )}
           </div>
 
           <div className="flex items-center gap-1.5">
-            <Award className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+            <Award className="w-3.5 h-3.5 text-slate-600 shrink-0" />
             <span className="truncate">
-              {primaryOffering.skill_labels || 'All recreational skill levels'}
+              {primaryOffering.skill_labels || 'Not confirmed'}
             </span>
           </div>
         </div>
 
         {/* Fee preview */}
         <div className="bg-slate-50 rounded-lg p-2.5 text-xs border border-slate-100 mb-2">
-          <div className="flex justify-between items-center text-slate-500 mb-0.5">
+          <div className="flex justify-between items-center text-slate-600 mb-0.5">
             <span>Registration Mode</span>
-            <span className="font-medium text-slate-800">{primaryOffering.registration_modes || 'Team only'}</span>
+            <span className="font-medium text-slate-800">{primaryOffering.registration_modes || 'Not confirmed'}</span>
           </div>
-          <div className="flex justify-between items-center text-slate-500">
-            <span>Estimated Fee</span>
+          <div className="flex justify-between items-center text-slate-600">
+            <span>Fee</span>
             <span className="font-semibold text-slate-900">{feeDisplay}</span>
           </div>
         </div>
@@ -112,17 +116,18 @@ export default function LeagueCard({ league, onSelect, onExternalClick }) {
 
       {/* Card Action Footer */}
       <div className="bg-slate-50/70 px-5 py-3 border-t border-slate-100 flex items-center justify-between text-xs">
-        <button
-          onClick={() => onSelect(league.slug)}
+        <a
+          href={`/leagues/${league.slug}`}
+          onClick={handleProfileClick}
           className="font-semibold text-blue-600 hover:text-blue-800 transition-colors"
         >
           View Profile & Details →
-        </button>
+        </a>
 
         {primaryOffering.registration_url && (
           <button
-            onClick={() => onExternalClick(primaryOffering.registration_url, league.name)}
-            className="text-slate-500 hover:text-slate-800 flex items-center gap-1 transition-colors"
+            onClick={() => onExternalClick(primaryOffering.registration_url, league.name, 'external_registration_clicked')}
+            className="text-slate-600 hover:text-slate-800 flex items-center gap-1 transition-colors"
             title="External official league website"
           >
             <span>Official Link</span>

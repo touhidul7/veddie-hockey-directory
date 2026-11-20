@@ -14,7 +14,8 @@ router.get('/', async (req, res) => {
     type,
     state
   } = req.query;
-  let whereClauses = ["lifecycle_state != 'draft'"];
+  if(Object.values(req.query).some(value=>typeof value!=='string'||value.length>200))return res.status(400).json({error:'Invalid event filters.'});
+  let whereClauses = ["lifecycle_state IN ('interest-only','announced','registration-open','registration-closed','completed','cancelled')"];
   let params = [];
   if (type) {
     whereClauses.push('event_type = ?');
@@ -53,7 +54,7 @@ router.get('/:slug', async (req, res) => {
       guaranteed_games, registration_deadline, format, policy_url, registration_url,
       description
     FROM rinkcircuit.events
-    WHERE slug = ? AND lifecycle_state != 'draft'
+    WHERE slug = ? AND lifecycle_state IN ('interest-only','announced','registration-open','registration-closed','completed','cancelled')
   `, slug);
   if (!event) {
     return res.status(404).json({

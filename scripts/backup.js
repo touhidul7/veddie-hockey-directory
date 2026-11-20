@@ -1,0 +1,9 @@
+const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
+const {getDb,closeDb}=require('../server/db/database');const {exportBackup}=require('../server/db/backup');const {encrypt,decrypt}=require('../server/services/backupEncryption');
+async function run(){const secret=process.env.BACKUP_ENCRYPTION_KEY;if(!/^[a-fA-F0-9]{64}$/.test(secret||''))throw new Error('Configure BACKUP_ENCRYPTION_KEY (64 hex characters) in the private environment first. Keep a separate recovery copy.');
+ if(process.argv[2]==='--inspect'){const data=decrypt(JSON.parse(fs.readFileSync(process.argv[3],'utf8')),secret);const tables=require('../server/db/tables.json');if(data.format!=='rinkcircuit-postgres-v1'||tables.some(t=>!Array.isArray(data[t])))throw new Error('Invalid backup structure.');console.log(JSON.stringify({format:data.format,exportedAt:data.exported_at,counts:Object.fromEntries(tables.map(t=>[t,data[t].length]))}));return;}
+ if(process.argv.length>2)throw new Error('Usage: node scripts/backup.js [--inspect encrypted-file]');
+ const data=await exportBackup(),envelope=encrypt(data,secret);const directory=path.resolve(__dirname,'../private-backups');fs.mkdirSync(directory,{recursive:true});const filename=path.join(directory,'rinkcircuit-'+new Date().toISOString().replace(/[:.]/g,'-')+'.json.enc');fs.writeFileSync(filename,JSON.stringify(envelope),{flag:'wx',mode:0o600});
+ await getDb().run("INSERT INTO rinkcircuit.audit_logs(id,actor,action,entity_type,entity_id,details_json,created_at) VALUES (?,'backup-cli','backup_export','database','rinkcircuit',?,?)",crypto.randomUUID(),JSON.stringify({encrypted:true,format:envelope.format}),new Date().toISOString());console.log('Encrypted backup created: '+filename);
+}
+run().catch(error=>{console.error('Backup operation failed:',error.code||error.message);process.exitCode=1;}).finally(closeDb);

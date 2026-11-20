@@ -1,0 +1,14 @@
+const fs=require('node:fs'),crypto=require('node:crypto');
+process.env.NODE_ENV='test';process.env.RINKCIRCUIT_TEST_SCHEMA='rinkcircuit_test_'+crypto.randomBytes(8).toString('hex');
+const {getDb,closeDb}=require('../server/db/database');const {migrate}=require('../server/db/migrate');const db=getDb();let server;
+async function run(){await migrate();const now=new Date().toISOString();
+await db.run(`INSERT INTO rinkcircuit.league_programmes(id,name,slug,area,municipality,category,publication_status,created_at,updated_at) SELECT 'perf_'||n,'Synthetic Hockey '||n,'perf-'||n,'Toronto','Toronto','Adult ice','published',?,? FROM generate_series(1,1000) n`,now,now);
+await db.run(`INSERT INTO rinkcircuit.season_offerings(id,programme_id,season_label,nights,created_at,updated_at) SELECT 'off_perf_'||n,'perf_'||n,'Winter 2026/27','["Monday"]',?,? FROM generate_series(1,1000) n`,now,now);
+server=require('../server/index').listen(0,'127.0.0.1');await new Promise(r=>server.once('listening',r));const base='http://127.0.0.1:'+server.address().port;
+const paths=['/','/api/leagues?city=Toronto&night=Monday&limit=12','/api/leagues/perf-1'];for(const route of paths)await (await fetch(base+route)).text();
+const samples=[];const started=performance.now();await Promise.all(Array.from({length:50},async()=>{for(const route of paths){const start=performance.now();try{const response=await fetch(base+route,{signal:AbortSignal.timeout(60000)});await response.text();samples.push({route,status:response.status,ms:Math.round(performance.now()-start)});}catch{samples.push({route,status:0,ms:Math.round(performance.now()-start)});}}}));
+const p95=values=>values.sort((a,b)=>a-b)[Math.ceil(values.length*.95)-1];const api=samples.filter(row=>row.route.startsWith('/api'));
+const report={date:'2026-11-20',environment:'Local Windows Node process with max-3 PostgreSQL pool connecting to remote Supabase; isolated schema, not Vercel staging',syntheticProgrammes:1000,concurrentUsers:50,requests:samples.length,elapsedMs:Math.round(performance.now()-started),p95ApiMs:p95(api.map(row=>row.ms)),targetApiMs:1000,errors:samples.filter(row=>row.status!==200).length,routes:paths.map(route=>({route,p95Ms:p95(samples.filter(row=>row.route===route).map(row=>row.ms))})),webVitals:'Not measured; deployed mobile LCP/CLS and field INP remain open'};report.targetMet=report.p95ApiMs<1000&&report.errors===0;
+fs.mkdirSync('artifacts/qa',{recursive:true});fs.writeFileSync('artifacts/qa/performance.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));if(report.errors)process.exitCode=1;
+}
+run().catch(e=>{console.error(e.message);process.exitCode=1;}).finally(async()=>{if(server)await new Promise(r=>server.close(r));try{await db.exec('DROP SCHEMA IF EXISTS rinkcircuit CASCADE');}finally{await closeDb();}});

@@ -1,13 +1,10 @@
-const { getDb } = require('./database');
-const db = getDb();
-console.log({
-  orgs: db.prepare("SELECT count(*) as c FROM organisations").get().c,
-  leagues: db.prepare("SELECT count(*) as c FROM league_programmes").get().c,
-  published: db.prepare("SELECT count(*) as c FROM league_programmes WHERE publication_status='published'").get().c,
-  draft: db.prepare("SELECT count(*) as c FROM league_programmes WHERE publication_status='draft'").get().c,
-  offerings: db.prepare("SELECT count(*) as c FROM season_offerings").get().c,
-  events: db.prepare("SELECT count(*) as c FROM events").get().c,
-  teams: db.prepare("SELECT count(*) as c FROM teams").get().c,
-  leads: db.prepare("SELECT count(*) as c FROM leads").get().c,
-  requests: db.prepare("SELECT count(*) as c FROM listing_requests").get().c
-});
+﻿const { getDb, closeDb } = require('./database');
+const tables = require('./tables.json');
+async function status() {
+  const db = getDb();
+  const counts = {};
+  for (const table of tables) counts[table] = (await db.get(`SELECT count(*) AS count FROM rinkcircuit.${table}`)).count;
+  console.log(JSON.stringify({ database:'Supabase PostgreSQL', schema:'rinkcircuit', counts },null,2));
+}
+if (require.main === module) status().catch(error=>{console.error('Database status failed:',error.code||error.message);process.exitCode=1;}).finally(closeDb);
+module.exports = { status };

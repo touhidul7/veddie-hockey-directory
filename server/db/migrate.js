@@ -15,10 +15,14 @@ async function migrate() {
     const directory = path.join(__dirname, 'migrations');
     for (const name of fs.readdirSync(directory).filter(name => name.endsWith('.sql')).sort()) {
       const sql = fs.readFileSync(path.join(directory, name), 'utf8');
-      const checksum = crypto.createHash('sha256').update(sql).digest('hex');
+      const normalizedSql = sql.replace(/\r\n/g, '\n');
+      const hash = value => crypto.createHash('sha256').update(value).digest('hex');
+      const checksum = hash(normalizedSql);
       const existing = await db.get('SELECT checksum FROM rinkcircuit.schema_migrations WHERE name = ?', name);
       if (existing) {
-        if (existing.checksum !== checksum) throw new Error(`Applied migration changed: ${name}`);
+        // Accept legacy Windows checksums while keeping future hashes portable.
+        if (![checksum, hash(sql), hash(normalizedSql.replace(/\n/g, '\r\n'))].includes(existing.checksum)) throw new Error(`Applied migration changed: ${name}`);
+        if (existing.checksum !== checksum) await db.run('UPDATE rinkcircuit.schema_migrations SET checksum = ? WHERE name = ?', checksum, name);
         continue;
       }
       await db.exec(sql);

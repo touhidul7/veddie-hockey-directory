@@ -31,7 +31,7 @@ export default function TeamsDirectoryPage({ navigate }) {
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             Approved Teams Directory
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+          <p className="text-xs sm:text-sm text-slate-600 mt-1">
             Verified team profiles representing adult hockey squads across the Greater Toronto Area.
           </p>
         </div>
@@ -47,7 +47,7 @@ export default function TeamsDirectoryPage({ navigate }) {
 
       {/* Filter by City */}
       <div className="flex items-center gap-2 overflow-x-auto pb-2 text-xs">
-        <span className="text-slate-400 font-medium">Filter City:</span>
+        <span className="text-slate-600 font-medium">Filter City:</span>
         {['', 'Toronto', 'Vaughan', 'Mississauga', 'Oakville', 'Markham'].map((city) => (
           <button
             key={city}
@@ -72,9 +72,9 @@ export default function TeamsDirectoryPage({ navigate }) {
         </div>
       ) : teams.length === 0 ? (
         <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center space-y-3">
-          <Users className="w-10 h-10 text-slate-400 mx-auto" />
+          <Users className="w-10 h-10 text-slate-600 mx-auto" />
           <h3 className="font-bold text-slate-800 text-base">No approved teams found in this city</h3>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-600">
             Be the first captain to register your squad in this region!
           </p>
           <div>
@@ -108,14 +108,14 @@ export default function TeamsDirectoryPage({ navigate }) {
                   <h3 className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors text-base">
                     {team.name}
                   </h3>
-                  <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-1">
-                    <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                  <div className="flex items-center gap-1.5 text-xs text-slate-600 mt-1">
+                    <MapPin className="w-3.5 h-3.5 text-slate-600" />
                     <span>{team.city}, ON</span>
                   </div>
                 </div>
 
                 <div className="text-xs text-slate-600 pt-1">
-                  <span className="text-slate-400 block text-[10px]">Affiliated Home League:</span>
+                  <span className="text-slate-600 block text-[10px]">Affiliated Home League:</span>
                   <span className="font-medium text-slate-800">{team.home_league_name || 'Independent Squad'}</span>
                 </div>
               </div>

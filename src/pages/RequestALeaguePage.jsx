@@ -6,10 +6,10 @@ export default function RequestALeaguePage({ navigate }) {
     name: '',
     email: '',
     phone: '',
-    city: 'Toronto',
+    city: new URLSearchParams(window.location.search).get('city')?.split(',')[0] || '',
     registration_mode: 'individual',
-    preferred_nights: ['Monday'],
-    skill_description: 'Recreational intermediate',
+    preferred_nights: [],
+    skill_description: '',
     roster_size_estimate: 1,
     additional_notes: '',
     marketing_consent: false
@@ -80,7 +80,7 @@ export default function RequestALeaguePage({ navigate }) {
         <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
           Can't find the right league? Request it.
         </h1>
-        <p className="text-xs sm:text-sm text-slate-500 max-w-md mx-auto leading-relaxed">
+        <p className="text-xs sm:text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
           Tell us where and when you want to play. We aggregate player demand to connect you with nearby teams or work with local rink convenors to launch new divisions.
         </p>
       </div>
@@ -115,9 +115,8 @@ export default function RequestALeaguePage({ navigate }) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Your Name *</label>
-                <input
-                  type="text"
+                <label htmlFor="requestaleaguepage-field-1" className="block font-semibold text-slate-700 mb-1">Your Name *</label>
+                <input id="requestaleaguepage-field-1" type="text"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -126,9 +125,8 @@ export default function RequestALeaguePage({ navigate }) {
                 />
               </div>
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Email Address *</label>
-                <input
-                  type="email"
+                <label htmlFor="requestaleaguepage-field-2" className="block font-semibold text-slate-700 mb-1">Email Address *</label>
+                <input id="requestaleaguepage-field-2" type="email"
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -140,9 +138,8 @@ export default function RequestALeaguePage({ navigate }) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Preferred City / Region *</label>
-                <select
-                  value={formData.city}
+                <label htmlFor="requestaleaguepage-field-3" className="block font-semibold text-slate-700 mb-1">Preferred City / Region *</label>
+                <select id="requestaleaguepage-field-3" value={formData.city}
                   onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                   className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white"
                 >
@@ -161,9 +158,8 @@ export default function RequestALeaguePage({ navigate }) {
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Looking as *</label>
-                <select
-                  value={formData.registration_mode}
+                <label htmlFor="requestaleaguepage-field-4" className="block font-semibold text-slate-700 mb-1">Looking as *</label>
+                <select id="requestaleaguepage-field-4" value={formData.registration_mode}
                   onChange={(e) => setFormData({ ...formData, registration_mode: e.target.value })}
                   className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white"
                 >
@@ -198,9 +194,8 @@ export default function RequestALeaguePage({ navigate }) {
             </div>
 
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Skill Level / Experience *</label>
-              <input
-                type="text"
+              <label htmlFor="requestaleaguepage-field-5" className="block font-semibold text-slate-700 mb-1">Skill Level / Experience *</label>
+              <input id="requestaleaguepage-field-5" type="text"
                 required
                 value={formData.skill_description}
                 onChange={(e) => setFormData({ ...formData, skill_description: e.target.value })}
@@ -210,9 +205,8 @@ export default function RequestALeaguePage({ navigate }) {
             </div>
 
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Additional Preferences or Rink Requests</label>
-              <textarea
-                rows={2}
+              <label htmlFor="requestaleaguepage-field-6" className="block font-semibold text-slate-700 mb-1">Additional Preferences or Rink Requests</label>
+              <textarea id="requestaleaguepage-field-6" rows={2}
                 value={formData.additional_notes}
                 onChange={(e) => setFormData({ ...formData, additional_notes: e.target.value })}
                 placeholder="e.g. Prefer rinks near subway, prefer games starting before 10:30 PM..."

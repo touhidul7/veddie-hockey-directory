@@ -1,63 +1,32 @@
-const crypto = require('crypto');
-const {
-  getDb
-} = require('../db/database');
-
-// In-memory outbox log for transactional emails
-const emailOutbox = [];
+﻿const crypto = require('crypto');
+const { getDb } = require('../db/database');
 async function sendVerificationEmail(leadId, leadEmail, leadName) {
   const db = getDb();
-
-  // Check if unexpired unused token already exists
-  const existing = await db.get(`
-    SELECT token, expires_at FROM rinkcircuit.email_verifications
-    WHERE lead_id = ? AND used_at IS NULL AND expires_at > ?
-    ORDER BY created_at DESC LIMIT 1
-  `, leadId, new Date().toISOString());
-  let token;
-  if (existing) {
-    token = existing.token;
-  } else {
-    token = crypto.randomBytes(24).toString('hex');
-    const expiresAt = new Date(Date.now() + 24 * 3600 * 1000).toISOString(); // 24 hours
+  return db.transaction(async () => {
+    await db.get('SELECT id FROM rinkcircuit.leads WHERE id = ? FOR UPDATE',leadId);
     const now = new Date().toISOString();
-    await db.run(`
-      INSERT INTO rinkcircuit.email_verifications (id, token, lead_id, expires_at, created_at)
-      VALUES (?, ?, ?, ?, ?)
-    `, `ver_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`, token, leadId, expiresAt, now);
-  }
-  const verificationUrl = `/verify-email?token=${token}`;
-  const emailRecord = {
-    id: `email_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`,
-    to: leadEmail,
-    name: leadName,
-    subject: 'Verify your hockey interest — RinkCircuit',
-    body: `Hello ${leadName},\n\nThank you for reaching out to RinkCircuit. Please confirm your email address by clicking the link below:\n\n${verificationUrl}\n\nThis single-use link expires in 24 hours.\n\nRinkCircuit - operated by Plaionn Sports Group`,
-    token,
-    verificationUrl,
-    sent_at: new Date().toISOString()
-  };
-  emailOutbox.push(emailRecord);
-  console.log('[EmailService] Verification queued in development outbox; delivery provider not configured.');
-  return emailRecord;
+    const existing = await db.get(`SELECT token FROM rinkcircuit.email_verifications
+      WHERE lead_id = ? AND used_at IS NULL AND expires_at > ? ORDER BY created_at DESC LIMIT 1`,leadId,now);
+    if (existing) return { token:existing.token, queued:true };
+    const token = crypto.randomBytes(24).toString('hex');
+    const verificationId = crypto.randomUUID();
+    const expiresAt = new Date(Date.now()+86400000).toISOString();
+    await db.run(`INSERT INTO rinkcircuit.email_verifications (id,token,lead_id,expires_at,created_at)
+      VALUES (?,?,?,?,?)`,verificationId,token,leadId,expiresAt,now);
+    const origin = process.env.APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:5173');
+    const verificationUrl = new URL(`/verify-email?token=${token}`,origin).toString();
+    const record = { id:crypto.randomUUID(), token, verificationUrl, queued:true };
+    await db.run(`INSERT INTO rinkcircuit.email_outbox (id,lead_id,recipient,subject,body,status,created_at,verification_id,expires_at)
+      VALUES (?,?,?,?,?,'pending',?,?,?)`,record.id,leadId,leadEmail,'Verify your hockey interest - RinkCircuit',
+      `Hello ${leadName},\n\nConfirm your email address: ${verificationUrl}\n\nThis link expires in 24 hours.\n\nRinkCircuit - operated by Plaionn Sports Group`,now,verificationId,expiresAt);
+    return record;
+  });
 }
-function sendReceiptEmail(to, name, subject, message) {
-  const emailRecord = {
-    id: `email_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`,
-    to,
-    name,
-    subject,
-    body: `Hello ${name},\n\n${message}\n\nRinkCircuit - operated by Plaionn Sports Group`,
-    sent_at: new Date().toISOString()
-  };
-  emailOutbox.push(emailRecord);
-  return emailRecord;
+async function sendReceiptEmail(to,name,subject,message) {
+  const id=crypto.randomUUID();
+  await getDb().run(`INSERT INTO rinkcircuit.email_outbox (id,recipient,subject,body,status,created_at)
+    VALUES (?,?,?,?,'pending',?)`,id,to,subject,`Hello ${name},\n\n${message}\n\nRinkCircuit`,new Date().toISOString());
+  return {id,queued:true};
 }
-function getOutbox() {
-  return emailOutbox;
-}
-module.exports = {
-  sendVerificationEmail,
-  sendReceiptEmail,
-  getOutbox
-};
+async function getOutbox() { return getDb().all('SELECT * FROM rinkcircuit.email_outbox ORDER BY created_at'); }
+module.exports = {sendVerificationEmail,sendReceiptEmail,getOutbox};

@@ -1,0 +1,5 @@
+const crypto=require('node:crypto');
+function key(value){if(typeof value!=='string'||!/^[a-fA-F0-9]{64}$/.test(value))throw new Error('BACKUP_ENCRYPTION_KEY must be 64 hex characters.');return Buffer.from(value,'hex');}
+function encrypt(data,secret){const iv=crypto.randomBytes(12),cipher=crypto.createCipheriv('aes-256-gcm',key(secret),iv);const content=Buffer.concat([cipher.update(JSON.stringify(data),'utf8'),cipher.final()]);return {format:'rinkcircuit-encrypted-v1',iv:iv.toString('base64'),tag:cipher.getAuthTag().toString('base64'),content:content.toString('base64')};}
+function decrypt(envelope,secret){if(envelope?.format!=='rinkcircuit-encrypted-v1')throw new Error('Unsupported encrypted backup.');const decipher=crypto.createDecipheriv('aes-256-gcm',key(secret),Buffer.from(envelope.iv,'base64'));decipher.setAuthTag(Buffer.from(envelope.tag,'base64'));return JSON.parse(Buffer.concat([decipher.update(Buffer.from(envelope.content,'base64')),decipher.final()]).toString('utf8'));}
+module.exports={encrypt,decrypt};

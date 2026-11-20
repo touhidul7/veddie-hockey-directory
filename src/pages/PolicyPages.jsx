@@ -1,12 +1,14 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Shield, FileText, Mail } from 'lucide-react';
 
 export function PrivacyPage() {
+  const [analytics,setAnalytics]=useState(()=>{try{return localStorage.getItem('rinkcircuit_analytics_consent')==='true';}catch{return false;}});
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6">
+      <label className="block rounded border bg-white p-4 text-sm"><input type="checkbox" checked={analytics} onChange={event=>{setAnalytics(event.target.checked);try{localStorage.setItem('rinkcircuit_analytics_consent',String(event.target.checked));}catch{}}} /> Allow optional usage counters. No search text, contact information or visitor identifier is included. You can withdraw here at any time.</label>
       <div className="flex items-center gap-2">
         <Shield className="w-6 h-6 text-blue-600" />
-        <h1 className="text-2xl font-bold text-slate-900">Privacy Policy (CASL Compliance)</h1>
+        <h1 className="text-2xl font-bold text-slate-900">Privacy notice ? awaiting owner approval</h1>
       </div>
       <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 space-y-4 text-xs text-slate-700 leading-relaxed">
         <p><strong>Effective Date:</strong> November 5, 2026 • Version 1.0</p>
