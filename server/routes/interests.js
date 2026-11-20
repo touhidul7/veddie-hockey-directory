@@ -8,6 +8,7 @@ const {
 const {
   sendVerificationEmail
 } = require('../services/emailService');
+const { deliverBatch } = require('../services/smtpDelivery');
 function normalizeEmail(email) {
   return (email || '').trim().toLowerCase();
 }
@@ -137,5 +138,8 @@ router.post('/', validateSubmission('interest'), async (req, res) => {
     };
   });
   res.status(response.status).json(response.body);
+  if (response.body.email_delivery === 'pending') {
+    deliverBatch().catch(err => console.error('Immediate email dispatch:', err.message));
+  }
 });
 module.exports = router;

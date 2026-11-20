@@ -7,6 +7,7 @@ const {
 const {
   sendVerificationEmail
 } = require('../services/emailService');
+const { deliverBatch } = require('../services/smtpDelivery');
 
 /**
  * POST /api/email-verifications
@@ -93,7 +94,10 @@ router.post('/resend', validateSubmission('resend'), async (req, res) => {
     error: 'Email is required.'
   });
   const lead = await getDb().get('SELECT id,name,email,verification_status FROM rinkcircuit.leads WHERE lower(email) = ?', email.trim().toLowerCase());
-  if (lead && lead.verification_status !== 'verified') await sendVerificationEmail(lead.id, lead.email, lead.name);
+  if (lead && lead.verification_status !== 'verified') {
+    await sendVerificationEmail(lead.id, lead.email, lead.name);
+    deliverBatch().catch(err => console.error('Immediate resend email dispatch:', err.message));
+  }
   res.json({
     success: true,
     message: 'If this address needs verification, a verification email is queued for delivery.'
