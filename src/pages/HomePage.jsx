@@ -120,12 +120,12 @@ export default function HomePage({ navigate, onExternalClick }) {
               />
             </div>
 
-            <div className="sm:w-48 flex items-center px-3 bg-slate-50 rounded-xl border border-slate-200/90 focus-within:border-blue-500 focus-within:bg-white transition-all">
+            <div className="sm:w-48 flex items-center px-3 bg-slate-50 rounded-xl border border-slate-200/90 focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/20 transition-all">
               <MapPin className="w-4 h-4 text-slate-500 shrink-0" />
               <select aria-label="Choose a city"
                 value={selectedCity}
                 onChange={(e) => setSelectedCity(e.target.value)}
-                className="w-full text-xs sm:text-sm py-2.5 sm:py-3 bg-transparent focus:outline-none text-slate-800 font-medium"
+                className="w-full text-xs sm:text-sm py-2.5 sm:py-3 bg-transparent focus:outline-none text-slate-800 font-medium cursor-pointer"
               >
                 <option value="">All GTA Cities</option>
                 {popularCities.map((c) => (

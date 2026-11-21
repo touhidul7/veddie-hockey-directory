@@ -61,7 +61,25 @@
   background: #94A3B8;
 }
 
-:focus-visible { outline: 3px solid #2563eb; outline-offset: 3px; }
+/* Form controls & outline resets - remove ugly focus outlines from all inputs, selects, textareas */
+input, select, textarea, button {
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
+input:focus, input:focus-visible,
+select:focus, select:focus-visible,
+textarea:focus, textarea:focus-visible,
+button:focus, button:focus-visible {
+  outline: none !important;
+  outline-offset: 0 !important;
+}
+
+/* Subtle, clean focus ring for keyboard navigation on links only */
+a:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
 button:disabled { cursor: not-allowed; opacity: .55; }
 input, select, textarea { max-width: 100%; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } }
