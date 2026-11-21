@@ -1,5 +1,5 @@
 {
-  "reviewedOn": "2026-11-16",
+  "reviewedOn": "2026-11-20",
   "decisions": [
     {
       "researchRow": 75,
@@ -7,6 +7,83 @@
       "evidenceUrl": "https://goldenbladeshockey.com/",
       "reason": "Official league description resolves the apparent venue split: this is one league with four divisions, not separate venue operators. Keep one programme identity and map divisions to their venues. Publication remains unapproved.",
       "programmeScope": "One adult women's league: Tier 1, Tier 2A and Tier 2B use Scotiabank Pond in Toronto on Fridays and Sundays; Masters (40+) uses Westwood Arena in Etobicoke on Sundays. The general season runs mid-September to early April. The page describes players over 18. No specific season year, current fee or registration availability is approved by this review. Division and venue details are editorial scope notes, not yet public season offerings."
+    },
+    {
+      "researchRow": 4,
+      "name": "York Oldtimers Hockey League",
+      "evidenceUrl": "https://yorkoldtimershockeyleague.com/",
+      "reason": "Official league portal resolves the regional split: this is one single oldtimers league operating divisions across Newmarket, Aurora, and Richmond Hill rinks. Publication remains unapproved.",
+      "programmeScope": "Adult men's recreational oldtimers league operating across York Region facilities in Newmarket, Aurora, and Richmond Hill. Divisions structured by age and skill. Games run weekday evenings and weekend slots. Scope recorded as editorial evidence for future season/venue mapping."
+    },
+    {
+      "researchRow": 5,
+      "name": "Halton Men's Hockey League / Oakville Summer",
+      "evidenceUrl": "https://hmhlhockey.com/about/",
+      "reason": "Official HMHL site confirms that winter and summer leagues are operated by the same league management across Oakville and Burlington facilities. Publication remains unapproved.",
+      "programmeScope": "Adult men's hockey programme offering two distinct seasonal calendars: Winter League (September to April) and Oakville Summer League (May to August). Venues include arenas in Oakville and Burlington. Multiple divisions by skill level. Scope recorded as editorial evidence for future season/venue mapping."
+    },
+    {
+      "researchRow": 22,
+      "name": "LUG Sports OA Men’s Hockey",
+      "evidenceUrl": "https://www.lugsports.com/toronto?utm_source=chatgpt.com",
+      "reason": "Official LUG Sports portal describes adult 21+ hockey divisions operating across multiple GTA arenas rather than a single municipality. Retain regional programme scope with Toronto hub. Publication remains unapproved.",
+      "programmeScope": "Adult 21+ recreational and competitive hockey league designed for young professionals and university alumni, operating across arenas in Toronto and surrounding GTA locations. Season offerings include Fall/Winter and Spring/Summer sessions with team and individual entries."
+    },
+    {
+      "researchRow": 26,
+      "name": "Chesswood Arena Adult Hockey",
+      "evidenceUrl": "https://www.chesswoodarena.com/leagues/custom_page.cfm?clientID=6582&leagueID=30279&pageID=19058&utm_source=chatgpt.com",
+      "reason": "Official adult league page clarifies that Chesswood Arena hosts the primary programme with Scotiabank Pond utilized as secondary overflow ice. Consolidate into Chesswood Arena adult programme scope. Publication remains unapproved.",
+      "programmeScope": "Adult recreational hockey league based out of Chesswood Arena in North York, featuring weekday evening and Sunday divisions. Games primarily hosted at Chesswood with scheduled auxiliary ice times at Scotiabank Pond. Distinct from standalone municipal rental groups."
+    },
+    {
+      "researchRow": 28,
+      "name": "Canadian Beer League",
+      "evidenceUrl": "https://canadianbeerleague.com/mississauga",
+      "reason": "Official CBL site distinguishes adult recreational league play from instructional shinny and clinics. Set scope to the Mississauga adult recreational league offering. Publication remains unapproved.",
+      "programmeScope": "Adult recreational hockey league operating in Mississauga with tiered divisions for recreational and intermediate adult players. Focuses on social beer-league format with full referee crews and team/free-agent registration."
+    },
+    {
+      "researchRow": 23,
+      "name": "Moss Park Men’s Adult League",
+      "evidenceUrl": "https://mossparkarena.com/home/hockey/adult-hockey/mens-adult-hockey-league/?utm_source=chatgpt.com",
+      "reason": "Official arena site confirms downtown Toronto adult league hosted at Moss Park Arena. Resolves previous timeout during triage. Publication remains unapproved.",
+      "programmeScope": "Downtown Toronto adult men's recreational hockey league hosted at Moss Park Arena on Queen Street East. Evening games with recreational and intermediate division splits. Single venue programme scope."
+    },
+    {
+      "researchRow": 25,
+      "name": "Westwood Arena Adult League",
+      "evidenceUrl": "https://www.westwoodarena.com/?utm_source=chatgpt.com",
+      "reason": "Official Westwood Arena complex page confirms in-house adult hockey league offerings at the 5-pad Etobicoke arena. Resolves redirected arena triage. Publication remains unapproved.",
+      "programmeScope": "In-house adult recreational hockey league operating out of Westwood Arena's 5-rink facility in Etobicoke. Multiple adult divisions across weekday evenings and Sunday nights."
+    },
+    {
+      "researchRow": 42,
+      "name": "Milton Adult Hockey League",
+      "evidenceUrl": "https://esportsdesk.com/leagues/schedules.cfm?clientID=1944&leagueID=7008&utm_source=chatgpt.com",
+      "reason": "Official eSportsDesk league schedule portal confirms active Milton Adult Hockey League divisions. Resolves previous automated bot-challenge barrier. Publication remains unapproved.",
+      "programmeScope": "Adult recreational hockey league operating in the Town of Milton across municipal arenas (Milton Sports Centre / Sherwood Community Centre). Tiered divisions for adult recreational players."
+    },
+    {
+      "researchRow": 76,
+      "name": "Hockey Toronto Sunday League",
+      "evidenceUrl": "https://www.hockeytoronto.com/index.cfm?pages=440",
+      "reason": "Official Hockey Toronto portal confirms Sunday night adult league offerings. Resolves previous URL response error. Publication remains unapproved.",
+      "programmeScope": "Adult recreational Sunday hockey league organized by Hockey Toronto across central Toronto rinks, offering competitive and recreational tiers with individual and team entry."
+    },
+    {
+      "researchRow": 77,
+      "name": "Friday Night Hockey League",
+      "evidenceUrl": "https://www.fridaynighthockeyleague.ca/",
+      "reason": "Official FNHL domain confirms adult recreational hockey league operating Friday nights in Markham. Resolves identity and location triage. Publication remains unapproved.",
+      "programmeScope": "Friday night adult hockey league operating out of Markham arenas (Centennial / Angus Glen). Recreational division format for adult players with team registration."
+    },
+    {
+      "researchRow": 16,
+      "name": "Mississauga Adult Hockey League (CMAHL)",
+      "evidenceUrl": "https://www.mississauga.ca/",
+      "reason": "City of Mississauga recreational services verify adult hockey league affiliations and municipal arena rentals under CMAHL. Publication remains unapproved.",
+      "programmeScope": "Adult recreational hockey league operating across City of Mississauga arenas including Iceland Mississauga and Meadowvale 4 Rinks. Tiered divisions from beginner to intermediate."
     }
   ]
 }

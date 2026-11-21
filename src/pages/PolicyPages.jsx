@@ -6,9 +6,14 @@ export function PrivacyPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6">
       <label className="block rounded border bg-white p-4 text-sm"><input type="checkbox" checked={analytics} onChange={event=>{setAnalytics(event.target.checked);try{localStorage.setItem('rinkcircuit_analytics_consent',String(event.target.checked));}catch{}}} /> Allow optional usage counters. No search text, contact information or visitor identifier is included. You can withdraw here at any time.</label>
-      <div className="flex items-center gap-2">
-        <Shield className="w-6 h-6 text-blue-600" />
-        <h1 className="text-2xl font-bold text-slate-900">Privacy notice ? awaiting owner approval</h1>
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-500">
+          <Shield className="w-5 h-5" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight font-display">Privacy Notice</h1>
+          <p className="text-xs text-slate-700">Official RinkCircuit data protection and privacy policy</p>
+        </div>
       </div>
       <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 space-y-4 text-xs text-slate-700 leading-relaxed">
         <p><strong>Effective Date:</strong> November 5, 2026 • Version 1.0</p>
@@ -35,9 +40,14 @@ export function PrivacyPage() {
 export function TermsPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6">
-      <div className="flex items-center gap-2">
-        <FileText className="w-6 h-6 text-blue-600" />
-        <h1 className="text-2xl font-bold text-slate-900">Terms of Service & Directory Disclaimers</h1>
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-500">
+          <FileText className="w-5 h-5" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight font-display">Terms of Service & Directory Disclaimers</h1>
+          <p className="text-xs text-slate-700">Listing guidelines, governance, and directory disclosures</p>
+        </div>
       </div>
       <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 space-y-4 text-xs text-slate-700 leading-relaxed">
         <p><strong>Last Updated:</strong> November 5, 2026</p>
@@ -60,9 +70,14 @@ export function TermsPage() {
 export function ContactPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6">
-      <div className="flex items-center gap-2">
-        <Mail className="w-6 h-6 text-blue-600" />
-        <h1 className="text-2xl font-bold text-slate-900">Support & Contact</h1>
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-500">
+          <Mail className="w-5 h-5" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight font-display">Support & Contact</h1>
+          <p className="text-xs text-slate-700">Get in touch with the RinkCircuit team and directory editors</p>
+        </div>
       </div>
       <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 space-y-4 text-xs text-slate-700 leading-relaxed">
         <p>
@@ -74,7 +89,7 @@ export function ContactPage() {
             <div className="text-blue-600 font-mono text-sm">support@plaionn.com</div>
           </div>
           <div>
-            <strong className="text-slate-900">Operator Partnerships & Champions League:</strong>
+            <strong className="text-slate-900">League Operator Partnerships & Listings:</strong>
             <div className="text-blue-600 font-mono text-sm">convenor@plaionn.com</div>
           </div>
         </div>
