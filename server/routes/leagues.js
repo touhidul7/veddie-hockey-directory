@@ -99,7 +99,8 @@ router.get('/', async (req, res) => {
       p.id, p.name, p.slug, p.area, p.municipality, p.category, p.sport_type,
       p.description, p.verification_status, p.owner_disclosure, p.is_sponsored,
       p.last_checked_at,
-      o.name as organisation_name, o.operator_type, o.is_plaionn_owned
+      o.name as organisation_name, o.operator_type, o.is_plaionn_owned,
+      (SELECT url FROM rinkcircuit.source_evidence WHERE programme_id = p.id ORDER BY created_at ASC LIMIT 1) as website_url
     FROM rinkcircuit.league_programmes p
     LEFT JOIN rinkcircuit.organisations o ON p.organisation_id = o.id
     WHERE ${whereClauses.join(' AND ')}

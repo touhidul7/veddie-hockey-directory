@@ -1,14 +1,21 @@
 import React from 'react';
-import { ShieldCheck, Calendar, MapPin, Award, CheckCircle2, AlertCircle, ArrowUpRight } from 'lucide-react';
+import { ShieldCheck, Calendar, MapPin, Award, CheckCircle2, AlertCircle, ArrowUpRight, Globe } from 'lucide-react';
 
-export default function LeagueCard({ league, onSelect, onExternalClick }) {
+function formatDomain(url) {
+  if (!url) return '';
+  try {
+    const parsed = new URL(url);
+    return parsed.hostname.replace(/^www\./, '');
+  } catch {
+    return url.replace(/^https?:\/\/(www\.)?/, '').split('/')[0];
+  }
+}
+
+export default function LeagueCard({ league, onExternalClick }) {
   const primaryOffering = (league.offerings && league.offerings[0]) || {};
   const nights = primaryOffering.nights || [];
   const nightsText = nights.length > 0 ? nights.join(', ') : 'Not confirmed';
-  const feeAmount = primaryOffering.fee_amount;
-  const feeDisplay = feeAmount === null || feeAmount === undefined
-    ? 'Not confirmed'
-    : `${primaryOffering.fee_currency ? `${primaryOffering.fee_currency} ` : ''}$${Number(feeAmount).toLocaleString()}${primaryOffering.fee_unit ? ` (${primaryOffering.fee_unit})` : ''}`;
+  const websiteUrl = league.website_url || primaryOffering.registration_url || null;
 
   // Verification badge
   const statusConfig = {
@@ -33,10 +40,10 @@ export default function LeagueCard({ league, onSelect, onExternalClick }) {
   const StatusIcon = status.icon;
   const isSponsored = Number(league.is_sponsored) === 1;
 
-  function handleProfileClick(event) {
-    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-    event.preventDefault();
-    onSelect(league.slug);
+  function handleWebsiteClick(e) {
+    if (onExternalClick && websiteUrl) {
+      onExternalClick(websiteUrl, league.name, 'website_clicked');
+    }
   }
 
   return (
@@ -49,29 +56,16 @@ export default function LeagueCard({ league, onSelect, onExternalClick }) {
             {status.label}
           </span>
 
-          <div className="flex items-center gap-1.5">
-            {league.sport_type === 'ball_hockey' ? (
-              <span className="text-[10px] font-bold uppercase tracking-wider bg-orange-50 text-orange-700 px-2.5 py-1 rounded-full border border-orange-200/80">
-                Ball Hockey
-              </span>
-            ) : (
-              <span className="text-[10px] font-bold uppercase tracking-wider bg-sky-50 text-sky-700 px-2.5 py-1 rounded-full border border-sky-200/80">
-                Ice Hockey
-              </span>
-            )}
-            {isSponsored && (
-              <span className="text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full border border-blue-200">
-                Featured
-              </span>
-            )}
-          </div>
+          {isSponsored && (
+            <span className="text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-800 px-2.5 py-1 rounded-full border border-blue-200">
+              Featured
+            </span>
+          )}
         </div>
 
         {/* League Title & Category */}
-        <h3 className="text-lg font-bold leading-snug mb-1.5">
-          <a href={`/leagues/${league.slug}`} onClick={handleProfileClick} className="text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-1">
-            {league.name}
-          </a>
+        <h3 className="text-lg font-bold leading-snug mb-1.5 text-slate-900">
+          {league.name}
         </h3>
         <p className="text-xs font-semibold text-blue-600 mb-4 tracking-wide uppercase">
           {league.category || 'Adult Hockey Programme'}
@@ -109,41 +103,44 @@ export default function LeagueCard({ league, onSelect, onExternalClick }) {
               {primaryOffering.skill_labels || 'All Skill Divisions'}
             </span>
           </div>
-        </div>
 
-        {/* Fee preview */}
-        <div className="bg-slate-50/90 rounded-xl p-3 text-xs border border-slate-100">
-          <div className="flex justify-between items-center text-slate-500 mb-1">
-            <span>Registration Mode</span>
-            <span className="font-semibold text-slate-700">{primaryOffering.registration_modes || 'Team & Individual'}</span>
-          </div>
-          <div className="flex justify-between items-center text-slate-500">
-            <span>Estimated Fee</span>
-            <span className="font-bold text-slate-900">{feeDisplay}</span>
-          </div>
+          {websiteUrl && (
+            <div className="flex items-center gap-2 pt-0.5">
+              <div className="w-5 h-5 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                <Globe className="w-3 h-3" />
+              </div>
+              <a
+                href={websiteUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={handleWebsiteClick}
+                className="text-blue-600 hover:text-blue-800 font-medium truncate underline decoration-blue-200 underline-offset-2"
+                title={websiteUrl}
+              >
+                {formatDomain(websiteUrl)}
+              </a>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Card Action Footer */}
       <div className="bg-gradient-to-r from-slate-50 to-blue-50/30 px-5 sm:px-6 py-3.5 border-t border-slate-100 flex items-center justify-between text-xs">
-        <a
-          href={`/leagues/${league.slug}`}
-          onClick={handleProfileClick}
-          className="font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 group/btn transition-colors"
-        >
-          <span>View League Details</span>
-          <span className="group-hover/btn:translate-x-1 transition-transform">→</span>
-        </a>
+        <span className="text-slate-500 font-medium">Official Website</span>
 
-        {primaryOffering.registration_url && (
-          <button
-            onClick={() => onExternalClick(primaryOffering.registration_url, league.name, 'external_registration_clicked')}
-            className="text-slate-500 hover:text-slate-800 flex items-center gap-1 font-medium transition-colors"
-            title="External official league website"
+        {websiteUrl ? (
+          <a
+            href={websiteUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={handleWebsiteClick}
+            className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-sm transition-all hover:scale-[1.02]"
           >
-            <span>Official Link</span>
+            <span>Visit Website</span>
             <ArrowUpRight className="w-3.5 h-3.5" />
-          </button>
+          </a>
+        ) : (
+          <span className="text-slate-400 italic">No link verified</span>
         )}
       </div>
     </div>

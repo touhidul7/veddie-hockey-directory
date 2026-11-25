@@ -146,7 +146,7 @@ export default function HomePage({ navigate, onExternalClick }) {
           {/* Quick Metrics Bar */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl mx-auto pt-4">
             <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-3 text-center backdrop-blur-xs">
-              <div className="text-xl sm:text-2xl font-extrabold text-sky-400">44+</div>
+              <div className="text-xl sm:text-2xl font-extrabold text-sky-400">80+</div>
               <div className="text-[11px] text-slate-400 uppercase font-semibold tracking-wider">Verified Leagues</div>
             </div>
             <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-3 text-center backdrop-blur-xs">
@@ -180,7 +180,7 @@ export default function HomePage({ navigate, onExternalClick }) {
             onClick={() => navigate('/leagues')}
             className="text-xs sm:text-sm font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 group"
           >
-            <span>View All 44 GTA Leagues</span>
+            <span>View All GTA Leagues</span>
             <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
           </button>
         </div>
