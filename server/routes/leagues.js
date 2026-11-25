@@ -10,7 +10,7 @@ const {
  */
 router.get('/', async (req, res) => {
   const db = getDb();
-  if(Object.values(req.query).some(value=>typeof value!=='string'||value.length>500))return res.status(400).json({error:'Invalid search parameters.'});
+  if (Object.values(req.query).some(value => typeof value !== 'string' || value.length > 500)) return res.status(400).json({ error: 'Invalid search parameters.' });
   const {
     q,
     city,
@@ -67,21 +67,21 @@ router.get('/', async (req, res) => {
 
   // Sport type filter (Ice hockey default vs Ball hockey)
   if (sport && sport.trim() !== 'all') {
-    if (!['ice_hockey', 'ball_hockey'].includes(sport.trim().toLowerCase())) return res.status(400).json({error:'Choose a valid sport type.'});
+    if (!['ice_hockey', 'ball_hockey'].includes(sport.trim().toLowerCase())) return res.status(400).json({ error: 'Choose a valid sport type.' });
     whereClauses.push('p.sport_type = ?');
     params.push(sport.trim().toLowerCase());
   }
 
   // All offering filters must match the SAME season offering.
-  const offeringFilters=[];
-  for(const [value,column] of [[season,'season_label'],[age,'age_eligibility'],[level,'skill_labels'],[reg,'registration_modes']]){
-    if(value?.trim()){offeringFilters.push(`lower(so.${column}) LIKE ?`);params.push(`%${value.trim().toLowerCase()}%`);}
+  const offeringFilters = [];
+  for (const [value, column] of [[season, 'season_label'], [age, 'age_eligibility'], [level, 'skill_labels'], [reg, 'registration_modes']]) {
+    if (value?.trim()) { offeringFilters.push(`lower(so.${column}) LIKE ?`); params.push(`%${value.trim().toLowerCase()}%`); }
   }
-  if(night?.trim()){
-    if(!['monday','tuesday','wednesday','thursday','friday','saturday','sunday'].includes(night.toLowerCase()))return res.status(400).json({error:'Choose a valid night.'});
-    offeringFilters.push('lower(so.nights) LIKE ?');params.push(`%"${night.toLowerCase()}"%`);
+  if (night?.trim()) {
+    if (!['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].includes(night.toLowerCase())) return res.status(400).json({ error: 'Choose a valid night.' });
+    offeringFilters.push('lower(so.nights) LIKE ?'); params.push(`%"${night.toLowerCase()}"%`);
   }
-  if(offeringFilters.length)whereClauses.push(`EXISTS (SELECT 1 FROM rinkcircuit.season_offerings so WHERE so.programme_id=p.id AND ${offeringFilters.join(' AND ')})`);
+  if (offeringFilters.length) whereClauses.push(`EXISTS (SELECT 1 FROM rinkcircuit.season_offerings so WHERE so.programme_id=p.id AND ${offeringFilters.join(' AND ')})`);
 
   // Sorting
   const countParams = [...params];
@@ -113,8 +113,8 @@ router.get('/', async (req, res) => {
   const leagues = await db.all(query, ...finalParams);
 
   // Fetch offerings and arenas in two bounded queries, not per result.
-  const offeringsByProgramme=await require('../services/publicOfferings').forProgrammes(leagues.map(l=>l.id));
-  const enrichedLeagues=leagues.map(league=>({...league,offerings:offeringsByProgramme.get(league.id)||[]}));
+  const offeringsByProgramme = await require('../services/publicOfferings').forProgrammes(leagues.map(l => l.id));
+  const enrichedLeagues = leagues.map(league => ({ ...league, offerings: offeringsByProgramme.get(league.id) || [] }));
 
   // Count total matches
   const countQuery = `
@@ -158,7 +158,7 @@ router.get('/:slug', async (req, res) => {
   `, slug); // 2. If not found, check slug_redirects (Acceptance A18: "Old slug redirects")
   if (!programme) {
     const resolved = await require('../services/slugResolver').resolveLeagueSlug(slug);
-    const redirect=resolved&&resolved.slug!==slug?{new_slug:resolved.slug}:null;
+    const redirect = resolved && resolved.slug !== slug ? { new_slug: resolved.slug } : null;
     if (redirect) {
       return res.status(301).json({
         redirect: true,
@@ -171,7 +171,7 @@ router.get('/:slug', async (req, res) => {
     });
   }
 
-  const offerings=(await require('../services/publicOfferings').forProgrammes([programme.id])).get(programme.id)||[];
+  const offerings = (await require('../services/publicOfferings').forProgrammes([programme.id])).get(programme.id) || [];
   // Fetch source evidence citations (Acceptance A03)
   const evidence = await db.all(`
     SELECT id, url, source_type, retrieved_at, checked_at, evidence_summary
@@ -188,7 +188,7 @@ router.get('/:slug', async (req, res) => {
     data: {
       ...programme,
       offerings,
-      evidence:evidence.map(item=>({...item,url:require('../services/publicOfferings').safeUrl(item.url)})),
+      evidence: evidence.map(item => ({ ...item, url: require('../services/publicOfferings').safeUrl(item.url) })),
       related
     }
   });
